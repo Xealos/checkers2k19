@@ -6,6 +6,7 @@ using Photon.Realtime;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
+
     #region Private Serializable Fields
 
     /// <summary>
@@ -14,6 +15,13 @@ public class Launcher : MonoBehaviourPunCallbacks
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
     [SerializeField]
     private byte maxPlayersPerRoom = 4;
+
+    [Tooltip("The UI Panel to let the user enter name, connect and play")]
+    [SerializeField]
+    private GameObject controlPanel;
+    [Tooltip("The UI Label to inform the user that the connection is in progress")]
+    [SerializeField]
+    private GameObject progressLabel;
 
     #endregion
 
@@ -24,6 +32,11 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     #endregion 
     // Start is called before the first frame update
+    void Start()
+    {
+        progressLabel.SetActive(false);
+        controlPanel.SetActive(true);
+    }
 
     /// <summary>
     /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
@@ -42,6 +55,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     /// </summary>
     public void Connect()
     {
+        progressLabel.SetActive(true);
+        controlPanel.SetActive(false);
+
         if(PhotonNetwork.IsConnected)
         {
            // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
@@ -69,6 +85,9 @@ public class Launcher : MonoBehaviourPunCallbacks
 
     public override void OnDisconnected(DisconnectCause cause)
     {
+        progressLabel.SetActive(false);
+        controlPanel.SetActive(true);
+        
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
 
