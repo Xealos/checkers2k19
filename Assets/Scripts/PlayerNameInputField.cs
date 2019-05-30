@@ -6,9 +6,6 @@ using UnityEngine.UI;
 using Photon.Pun;
 
 [RequireComponent(typeof(InputField))]
-/// <summary>
-/// Player name input field.true Let the user input their name, will appear in the UI in the game.
-/// </summary>
 public class PlayerNameInputField : MonoBehaviour
 {
     //Store the PlayerPref Key to avoid typos
