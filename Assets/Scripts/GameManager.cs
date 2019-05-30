@@ -1,70 +1,66 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-using Photon.Pun;
-using Photon.Realtime;
+public class GameManager : MonoBehaviourPunCallbacks
+{   
+    // public void OnEnable()
+    // {
+    //     PhotonNetwork.AddCallbackTarget(this);
+    // }
 
-namespace Photon.Checkers
-{
-    public class GameManager : MonoBehaviourPunCallbacks
-    {   
-        // public void OnEnable()
-        // {
-        //     PhotonNetwork.AddCallbackTarget(this);
-        // }
+    #region Photon Callbacks
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene(0);
+    }
 
-        #region Photon Callbacks
-        public override void OnLeftRoom()
+    public override void OnPlayerEnteredRoom(Player other)
+    {
+        // not seen if you're the player connecting
+        Debug.LogFormat("OnPlayerEnteredRoom () {0}", other.NickName); 
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            SceneManager.LoadScene(0);
-        }
+            Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
 
-        public override void OnPlayerEnteredRoom(Player other)
+            LoadArena();
+        }
+    }
+        
+
+    public override void OnPlayerLeftRoom(Player other)
+    {
+        // seen when other disconnects
+        Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
+
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            // not seen if you're the player connecting
-            Debug.LogFormat("OnPlayerEnteredRoom () {0}", other.NickName); 
+            Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
 
-            if (PhotonNetwork.IsMasterClient)
-            {
-                Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
-
-                LoadArena();
-            }
+            LoadArena();
         }
+    }
 
-        public override void OnPlayerLeftRoom(Player other)
+    #endregion
+
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    private void LoadArena()
+    {
+        if (PhotonNetwork.IsMasterClient == false)
         {
-            // seen when other disconnects
-            Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
-
-
-            if (PhotonNetwork.IsMasterClient)
-            {
-                Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
-
-                LoadArena();
-            }
+            Debug.LogError("PhotonNetwork : Trying to load a level be we are not the master client.");
         }
-
-        #endregion
-
-        public void LeaveRoom()
-        {
-            PhotonNetwork.LeaveRoom();
-        }
-
-        private void LoadArena()
-        {
-            if (PhotonNetwork.IsMasterClient == false)
-            {
-                Debug.LogError("PhotonNetwork : Trying to load a level be we are not the master client.");
-            }
-            Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
-            PhotonNetwork.LoadLevel("CheckerboardScene");
-        }
-
+        Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
+        PhotonNetwork.LoadLevel("CheckerboardScene");
     }
 
 }
