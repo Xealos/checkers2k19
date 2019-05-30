@@ -103,12 +103,13 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
-
+    /// <summary>
+    /// Callback that creates a new room if we are unable to find an available room to join. 
+    /// </summary>
+    /// <param name="returnCode"></param>
+    /// <param name="message"></param>
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
-
-        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
         PhotonNetwork.CreateRoom(null, new RoomOptions{ MaxPlayers = maxPlayersPerRoom });
     }
 
