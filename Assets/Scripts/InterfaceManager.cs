@@ -25,9 +25,9 @@ public class InterfaceManager : MonoBehaviour
         if(PhotonNetwork.PlayerList.Count() > 1)
         {
             // Assume we only have two players
-            Player[] players = PhotonNetwork.PlayerList;
+            Player[] players = PhotonNetwork.PlayerListOthers;
 
-            OpponentName.text = players[1].NickName;
+            OpponentName.text = players[0].NickName;
         }
         
     }
