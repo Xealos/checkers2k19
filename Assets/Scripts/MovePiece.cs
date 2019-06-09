@@ -1,9 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class MovePiece : MonoBehaviour
+public class MovePiece : MonoBehaviourPunCallbacks
 {
+    public PhotonView playerPhotonView;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
@@ -43,7 +44,14 @@ public class MovePiece : MonoBehaviour
 
 private void Update()
     {
-        if (Input.GetMouseButtonDown(0)){
+        if (Input.GetMouseButtonDown(0))
+        {
+            // Only let the player move the piece if they instantiated it. 
+            if (!photonView.IsMine && PhotonNetwork.IsConnected)
+            {
+                return;
+            }
+            
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
