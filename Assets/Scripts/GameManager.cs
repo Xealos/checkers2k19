@@ -1,16 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Photon.Pun;
+﻿using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourPunCallbacks
-{   
-    // public void OnEnable()
-    // {
-    //     PhotonNetwork.AddCallbackTarget(this);
-    // }
+{
+    public GameObject blackCheckerPrefab;
+
+    public GameObject whiteCheckerPrefab;
+
+    private static bool _instantiated;
+
+    private bool _player1;
+
+    void Start()
+    {
+        GameObject checker = null;
+        
+        // Only execute if we haven't instantiated our checkers yet. This prevents the player 1 entering the room
+        // from instantiating another set of objects when player 2 enters. 
+        if (_instantiated == false)
+        {
+            // If we're the first player to join, set us to player 1. 
+            _player1 = PhotonNetwork.CurrentRoom.PlayerCount == 1;
+            
+            // TODO Brandon: Maybe let the player creating the room pick the color they want. 
+            if (_player1)
+            {
+                // TODO Tim: Create the whole set of black checkers.
+                checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, new Vector3(0.829f, 0.261f, 2.38423f), 
+                    Quaternion.Euler(-90, 0, 0 ));
+            }
+            else
+            {
+                // TODO Tim: Create the whole set of white checkers.
+                checker= PhotonNetwork.Instantiate(whiteCheckerPrefab.name, new Vector3(0.16f, 0.26f, 2.4f),
+                    Quaternion.Euler(-90, 0, 0));
+            }
+
+            _instantiated = true;
+
+        }
+        
+        if (checker != null)
+        {
+            //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
+            //scene reloads.
+            DontDestroyOnLoad(checker);
+        }
+    }
 
     #region Photon Callbacks
     public override void OnLeftRoom()
