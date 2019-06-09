@@ -14,7 +14,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     /// </summary>
     [Tooltip("The maximum number of players per room. When a room is full, it can't be joined by new players, and so new room will be created")]
     [SerializeField]
-    private byte maxPlayersPerRoom = 4;
+    private byte maxPlayersPerRoom = 2;
 
     [Tooltip("The UI Panel to let the user enter name, connect and play")]
     [SerializeField]
@@ -103,6 +103,7 @@ public class Launcher : MonoBehaviourPunCallbacks
 
         Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
+    
     /// <summary>
     /// Callback that creates a new room if we are unable to find an available room to join. 
     /// </summary>
