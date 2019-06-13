@@ -5,6 +5,7 @@ using UnityEngine;
 public class MovePiece : MonoBehaviourPunCallbacks
 {
     public PhotonView playerPhotonView;
+    public bool selected;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
@@ -47,26 +48,54 @@ private void Update()
         if (Input.GetMouseButtonDown(0))
         {
             // Only let the player move the piece if they instantiated it. 
+            /*
             if (!photonView.IsMine && PhotonNetwork.IsConnected)
             {
                 return;
             }
-            
+            */
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             if (Physics.Raycast(ray, out hit, 100.00f)){
 
                 if (hit.transform != null){
-                    //PrintName(hit.transform.gameObject);
 
-                    if (SPACE_NAMES.Contains(hit.transform.gameObject.name)) {
-
-                        MoveChecker(hit.transform.gameObject);
+                    if(hit.transform.gameObject.tag == this.gameObject.tag && hit.transform.gameObject.name == this.gameObject.name)
+                    {
+                        selected = true;
+                    }
+                    else if (SPACE_NAMES.Contains(hit.transform.gameObject.name) && selected)
+                    {
+                        // Validate movement here.
+                        if (isMoveValid(hit.transform.gameObject.name))
+                        {
+                            MoveChecker(hit.transform.gameObject);
+                            selected = false;
+                        }
+                    }
+                    else
+                    {
+                        selected = false;
                     }
                 }
             }
         }
+    }
+
+    private bool isMoveValid(string name)
+    {
+        // Path 1 - Valid - Adjacent space (forward) with no piece on it.
+
+        // Path 2 - Invalid - Adjacent space (forward) with a piece on it.
+
+        // Path 3 - Invalid - Adjacent space (backward)
+
+        // Path 4 - Valid - 2 spaces ahead with only an opposing piece in between.
+
+        // Path 5 - Invalid - 2 spaces ahead with a piece in between and a piece on it.
+
+        return false;
     }
 
     private void MoveChecker(GameObject go)
