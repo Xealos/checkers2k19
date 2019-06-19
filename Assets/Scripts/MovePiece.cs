@@ -95,7 +95,7 @@ private void Update()
 
         // Path 5 - Invalid - 2 spaces ahead with a piece in between and a piece on it.
 
-        return false;
+        return true;
     }
 
     private void MoveChecker(GameObject go)
