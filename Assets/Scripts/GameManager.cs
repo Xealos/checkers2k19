@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviourPunCallbacks
                 {
                     checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, coords.Value,
                     Quaternion.Euler(-90, 0, 0));
+
+                    checker.name = "B Checker " + coords.Key;
+                    checker.tag = coords.Key;
                 }
             }
             else
@@ -40,8 +43,11 @@ public class GameManager : MonoBehaviourPunCallbacks
                 // Create the whole set of white checkers.
                 foreach (KeyValuePair<string, Vector3> coords in whiteSpawnPoints)
                 {
-                    checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, coords.Value,
+                    checker = PhotonNetwork.Instantiate(whiteCheckerPrefab.name, coords.Value,
                     Quaternion.Euler(-90, 0, 0));
+
+                    checker.name = "W Checker " + coords.Key;
+                    checker.tag = coords.Key;
                 }
             }
 

@@ -6,6 +6,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 {
     public PhotonView playerPhotonView;
     public bool selected;
+    public bool isKing;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
@@ -48,12 +49,11 @@ private void Update()
         if (Input.GetMouseButtonDown(0))
         {
             // Only let the player move the piece if they instantiated it. 
-            /*
             if (!photonView.IsMine && PhotonNetwork.IsConnected)
             {
                 return;
             }
-            */
+            
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -61,7 +61,7 @@ private void Update()
 
                 if (hit.transform != null){
 
-                    if(hit.transform.gameObject.tag == this.gameObject.tag && hit.transform.gameObject.name == this.gameObject.name)
+                    if(hit.transform.gameObject.name == this.gameObject.name)
                     {
                         selected = true;
                     }
@@ -72,6 +72,7 @@ private void Update()
                         {
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
+                            this.gameObject.tag = hit.transform.gameObject.name;
                         }
                     }
                     else
@@ -83,11 +84,26 @@ private void Update()
         }
     }
 
+    // Pass in the name of the space.
     private bool isMoveValid(string name)
     {
-        // Path 1 - Valid - Adjacent space (forward) with no piece on it.
+        // Path 1 - Invalid - Adjacent space (forward) with a piece on it.
 
-        // Path 2 - Invalid - Adjacent space (forward) with a piece on it.
+        // Path 2 - Valid - Adjacent space (forward) with no piece on it.
+        if (isKing)
+        {
+            // TODO: Validate Movement if piece is a king.
+        }
+        else
+        {
+            foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
+            {
+                if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                {
+                    return true;
+                }
+            }
+        }
 
         // Path 3 - Invalid - Adjacent space (backward)
 
@@ -95,11 +111,202 @@ private void Update()
 
         // Path 5 - Invalid - 2 spaces ahead with a piece in between and a piece on it.
 
-        return true;
+        return false;
     }
 
     private void MoveChecker(GameObject go)
     {
         this.gameObject.transform.position = new Vector3(go.transform.position.x, 0.26f, go.transform.position.z);
     }
+
+    private Dictionary<string, List<string>> validBlackMovements_Regular = new Dictionary<string, List<string>>(){
+        { "A1",
+            new List<string>(){
+                { "B2" }
+            }
+        },
+
+        { "A3",
+            new List<string>(){
+                { "B2" },
+                { "B4" }
+            }
+        },
+
+        { "A5",
+            new List<string>(){
+                { "B4" },
+                { "B6" }
+            }
+        },
+
+        { "A7",
+            new List<string>(){
+                { "B6" },
+                { "B8" }
+            }
+        },
+
+        { "B2",
+            new List<string>(){
+                { "C1" },
+                { "C3" }
+            }
+        },
+
+        { "B4",
+            new List<string>(){
+                { "C3" },
+                { "C5" }
+            }
+        },
+
+        { "B6",
+            new List<string>(){
+                { "C5" },
+                { "C7" }
+            }
+        },
+
+        { "B8",
+            new List<string>(){
+                { "C7" }
+            }
+        },
+
+        { "C1",
+            new List<string>(){
+                { "D2" }
+            }
+        },
+
+        { "C3",
+            new List<string>(){
+                { "D2" },
+                { "D4" }
+            }
+        },
+
+        { "C5",
+            new List<string>(){
+                { "D4" },
+                { "D6" }
+            }
+        },
+
+        { "C7",
+            new List<string>(){
+                { "D6" },
+                { "D8" }
+            }
+        },
+
+        { "D2",
+            new List<string>(){
+                { "E1" },
+                { "E3" }
+            }
+        },
+
+        { "D4",
+            new List<string>(){
+                { "E3" },
+                { "E5" }
+            }
+        },
+
+        { "D6",
+            new List<string>(){
+                { "E5" },
+                { "E7" }
+            }
+        },
+
+        { "D8",
+            new List<string>(){
+                { "E7" }
+            }
+        },
+
+        { "E1",
+            new List<string>(){
+                { "F2" }
+            }
+        },
+
+        { "E3",
+            new List<string>(){
+                { "F2" },
+                { "F4" }
+            }
+        },
+
+        { "E5",
+            new List<string>(){
+                { "F4" },
+                { "F6" }
+            }
+        },
+
+        { "E7",
+            new List<string>(){
+                { "F6" },
+                { "F8" }
+            }
+        },
+
+        { "F2",
+            new List<string>(){
+                { "G1" },
+                { "G3" }
+            }
+        },
+
+        { "F4",
+            new List<string>(){
+                { "G3" },
+                { "G5" }
+            }
+        },
+
+        { "F6",
+            new List<string>(){
+                { "G5" },
+                { "G7" }
+            }
+        },
+
+        { "F8",
+            new List<string>(){
+                { "G7" }
+            }
+        },
+
+        { "G1",
+            new List<string>(){
+                { "H2" }
+            }
+        },
+
+        { "G3",
+            new List<string>(){
+                { "H2" },
+                { "H4" }
+            }
+        },
+
+        { "G5",
+            new List<string>(){
+                { "H4" },
+                { "H6" }
+            }
+        },
+
+        { "G7",
+            new List<string>(){
+                { "H6" },
+                { "H8" }
+            }
+        },
+    };
 }

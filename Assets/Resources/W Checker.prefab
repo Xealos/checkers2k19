@@ -125,6 +125,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPhotonView: {fileID: 8492123628440828609}
+  selected: 0
+  isKing: 0
 --- !u!114 &8492123628440828609
 MonoBehaviour:
   m_ObjectHideFlags: 0
