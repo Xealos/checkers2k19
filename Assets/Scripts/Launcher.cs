@@ -41,6 +41,10 @@ public class Launcher : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        //Disable fullscreen
+        //TODO Brandon: This is probably not a good long term solution
+        Screen.fullScreen = false;
+        
         progressLabel.SetActive(false);
         controlPanel.SetActive(true);
     }
