@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +12,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject whiteCheckerPrefab;
 
     public Camera playerCamera;
+    
+    private PunTurnManager _turnManager;
+
+    private TurnManagerListeners _turnListeners;
 
     private static bool _instantiated;
 
@@ -18,6 +23,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        _turnManager = GetComponent<PunTurnManager>();
+        _turnListeners = GetComponent<TurnManagerListeners>();
+
+        _turnManager.TurnManagerListener = _turnListeners;
+        
         // Only execute if we haven't instantiated our checkers yet. This prevents the player 1 entering the room
         // from instantiating another set of objects when player 2 enters. 
         if (_instantiated == false)
@@ -29,10 +39,35 @@ public class GameManager : MonoBehaviourPunCallbacks
 
             SetupCamera(_player1);
 
+            SetupTurns(_player1);
+            
             _instantiated = true;
 
         }
         
+    }
+
+    public bool IsMoveValid()
+    {
+        if (_turnListeners.myTurn)
+        {
+            //TODO Tim: Add move validity logic here maybe? 
+        
+            //TODO Tim: Update the game manager with the new board state
+        
+            //If we've determined the move to be valid, send it to the other player and finish our turn
+            //TODO Brandon: What data should we send? The piece and new coordinates?
+            _turnManager.SendMove(null, true);
+        }
+
+        else
+        {
+            // It's not the players turn, they can't move anything right now.
+            return false;
+        }
+
+
+        return true;
     }
 
     #region Photon Callbacks
@@ -53,7 +88,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             LoadArena();
         }
     }
-
 
     public override void OnPlayerLeftRoom(Player other)
     {
@@ -141,6 +175,18 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    private void SetupTurns(bool player1)
+    {
+        if (player1)
+        {
+            _turnListeners.myTurn = true;
+        }
+        else
+        {
+            _turnListeners.myTurn = false;
+        }
+    }
+
     private Dictionary<string, Vector3> blackSpawnPoints = new Dictionary<string, Vector3>(){
         { "A1", new Vector3(2.765f, 0.261f, 2.422f)},
         { "A3", new Vector3(1.459f, 0.261f, 2.422f)},
@@ -171,3 +217,4 @@ public class GameManager : MonoBehaviourPunCallbacks
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
 }
+

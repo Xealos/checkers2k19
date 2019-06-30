@@ -38,6 +38,7 @@ TagManager:
   - B4
   - B6
   - B8
+  - GameManager
   layers:
   - Default
   - TransparentFX

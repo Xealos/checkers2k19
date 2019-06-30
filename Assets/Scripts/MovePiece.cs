@@ -2,10 +2,15 @@
 using Photon.Pun;
 using UnityEngine;
 
+
 public class MovePiece : MonoBehaviourPunCallbacks
 {
+    private GameManager _gameManager; 
+    
     public PhotonView playerPhotonView;
+    
     public bool selected;
+    
     public bool isKing;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
@@ -44,10 +49,17 @@ public class MovePiece : MonoBehaviourPunCallbacks
             "H8",
         };
 
-private void Update()
+    void Start()
+    {
+        //Get the game manager component script
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+    }
+
+    private void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
+            
             // Only let the player move the piece if they instantiated it. 
             if (!photonView.IsMine && PhotonNetwork.IsConnected)
             {
@@ -68,7 +80,7 @@ private void Update()
                     else if (SPACE_NAMES.Contains(hit.transform.gameObject.name) && selected)
                     {
                         // Validate movement here.
-                        if (isMoveValid(hit.transform.gameObject.name))
+                        if (IsMoveValid(hit.transform.gameObject.name))
                         {
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
@@ -85,7 +97,7 @@ private void Update()
     }
 
     // Pass in the name of the space.
-    private bool isMoveValid(string name)
+    private bool IsMoveValid(string name)
     {
         // Path 1 - Invalid - Adjacent space (forward) with a piece on it.
 
@@ -96,13 +108,22 @@ private void Update()
         }
         else
         {
-            foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
+            
+            //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
+            // First, see if the game manager says it's okay to make a move.
+            if (_gameManager.IsMoveValid())
             {
-                if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
                 {
-                    return true;
+                    if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                    {
+                    
+                        return true;
+                    }
                 }
             }
+            
+
         }
 
         // Path 3 - Invalid - Adjacent space (backward)
