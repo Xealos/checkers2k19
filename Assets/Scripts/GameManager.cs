@@ -125,6 +125,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         GameObject checker = null;
         
         // TODO Brandon: Maybe let the player creating the room pick the color they want. 
+        // TODO Tim: This logic is repetitive. Recommend assigning local variables and consolidating to one foreach loop.
         if (player1)
         {
             // Create the whole set of black checkers.
@@ -135,6 +136,10 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 checker.name = "B Checker " + coords.Key;
                 checker.tag = coords.Key;
+                
+                //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
+                //scene reloads.
+                DontDestroyOnLoad(checker);
             }
         }
         else
@@ -147,14 +152,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
                 checker.name = "W Checker " + coords.Key;
                 checker.tag = coords.Key;
+                
+                //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
+                //scene reloads.
+                DontDestroyOnLoad(checker);
             }
-        }
-        
-        if (checker != null)
-        {
-            //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
-            //scene reloads.
-            DontDestroyOnLoad(checker);
         }
     }
 
