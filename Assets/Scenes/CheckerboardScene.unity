@@ -1997,6 +1997,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 5913835296202712587, guid: 42f469271c7cd0746a5df66a0078e4dd,
         type: 3}
+    - target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
+        type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 508734674}
     - target: {fileID: 8181271757210950947, guid: 455c4d7b6da52634699744165a02e403,
         type: 3}
       propertyPath: m_LocalPosition.x

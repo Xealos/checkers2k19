@@ -10,14 +10,14 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public GameObject whiteCheckerPrefab;
 
+    public Camera playerCamera;
+
     private static bool _instantiated;
 
     private bool _player1;
 
     void Start()
     {
-        GameObject checker = null;
-
         // Only execute if we haven't instantiated our checkers yet. This prevents the player 1 entering the room
         // from instantiating another set of objects when player 2 enters. 
         if (_instantiated == false)
@@ -25,42 +25,14 @@ public class GameManager : MonoBehaviourPunCallbacks
             // If we're the first player to join, set us to player 1. 
             _player1 = PhotonNetwork.CurrentRoom.PlayerCount == 1;
 
-            // TODO Brandon: Maybe let the player creating the room pick the color they want. 
-            if (_player1)
-            {
-                // Create the whole set of black checkers.
-                foreach (KeyValuePair<string, Vector3> coords in blackSpawnPoints)
-                {
-                    checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, coords.Value,
-                    Quaternion.Euler(-90, 0, 0));
+            SetupCheckers(_player1);
 
-                    checker.name = "B Checker " + coords.Key;
-                    checker.tag = coords.Key;
-                }
-            }
-            else
-            {
-                // Create the whole set of white checkers.
-                foreach (KeyValuePair<string, Vector3> coords in whiteSpawnPoints)
-                {
-                    checker = PhotonNetwork.Instantiate(whiteCheckerPrefab.name, coords.Value,
-                    Quaternion.Euler(-90, 0, 0));
-
-                    checker.name = "W Checker " + coords.Key;
-                    checker.tag = coords.Key;
-                }
-            }
+            SetupCamera(_player1);
 
             _instantiated = true;
 
         }
-
-        if (checker != null)
-        {
-            //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
-            //scene reloads.
-            DontDestroyOnLoad(checker);
-        }
+        
     }
 
     #region Photon Callbacks
@@ -112,6 +84,61 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("CheckerboardScene");
+    }
+
+    private void SetupCheckers(bool player1)
+    {
+        GameObject checker = null;
+        
+        // TODO Brandon: Maybe let the player creating the room pick the color they want. 
+        if (player1)
+        {
+            // Create the whole set of black checkers.
+            foreach (KeyValuePair<string, Vector3> coords in blackSpawnPoints)
+            {
+                checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, coords.Value,
+                    Quaternion.Euler(-90, 0, 0));
+
+                checker.name = "B Checker " + coords.Key;
+                checker.tag = coords.Key;
+            }
+        }
+        else
+        {
+            // Create the whole set of white checkers.
+            foreach (KeyValuePair<string, Vector3> coords in whiteSpawnPoints)
+            {
+                checker = PhotonNetwork.Instantiate(whiteCheckerPrefab.name, coords.Value,
+                    Quaternion.Euler(-90, 0, 0));
+
+                checker.name = "W Checker " + coords.Key;
+                checker.tag = coords.Key;
+            }
+        }
+        
+        if (checker != null)
+        {
+            //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
+            //scene reloads.
+            DontDestroyOnLoad(checker);
+        }
+    }
+
+    private void SetupCamera(bool player1)
+    {
+        var camTransform = playerCamera.transform;
+        
+        if (player1)
+        {
+            
+            camTransform.position = new Vector3(0.303f, 3.185f, 4.822f);
+            camTransform.rotation = Quaternion.Euler(45, -180, 0);
+        }
+        else
+        {
+            camTransform.position = new Vector3(0.303f, 3.185f, -4.822f);
+            camTransform.rotation = Quaternion.Euler(45, 0, 0);
+        }
     }
 
     private Dictionary<string, Vector3> blackSpawnPoints = new Dictionary<string, Vector3>(){
