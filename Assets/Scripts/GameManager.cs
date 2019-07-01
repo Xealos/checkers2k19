@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private static bool _instantiated;
 
-    private bool _player1;
+    public bool _player1;
 
     void Start()
     {
@@ -123,40 +123,40 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void SetupCheckers(bool player1)
     {
         GameObject checker = null;
-        
+        Dictionary<string, Vector3> test;
+        string prefabName;
+
         // TODO Brandon: Maybe let the player creating the room pick the color they want. 
         // TODO Tim: This logic is repetitive. Recommend assigning local variables and consolidating to one foreach loop.
         if (player1)
         {
-            // Create the whole set of black checkers.
-            foreach (KeyValuePair<string, Vector3> coords in blackSpawnPoints)
-            {
-                checker = PhotonNetwork.Instantiate(blackCheckerPrefab.name, coords.Value,
-                    Quaternion.Euler(-90, 0, 0));
-
-                checker.name = "B Checker " + coords.Key;
-                checker.tag = coords.Key;
-                
-                //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
-                //scene reloads.
-                DontDestroyOnLoad(checker);
-            }
+            test = blackSpawnPoints;
+            prefabName = blackCheckerPrefab.name;
         }
         else
         {
-            // Create the whole set of white checkers.
-            foreach (KeyValuePair<string, Vector3> coords in whiteSpawnPoints)
-            {
-                checker = PhotonNetwork.Instantiate(whiteCheckerPrefab.name, coords.Value,
-                    Quaternion.Euler(-90, 0, 0));
 
-                checker.name = "W Checker " + coords.Key;
-                checker.tag = coords.Key;
-                
-                //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
-                //scene reloads.
-                DontDestroyOnLoad(checker);
-            }
+            test = whiteSpawnPoints;
+            prefabName = whiteCheckerPrefab.name;
+        }
+
+        // Create the whole set of checkers.
+        foreach (KeyValuePair<string, Vector3> coords in test)
+        {
+            checker = PhotonNetwork.Instantiate(prefabName, coords.Value,
+                Quaternion.Euler(-90, 0, 0));
+
+            checker.name = prefabName + " " + coords.Key;
+            
+            // TODO TIM: Is the tag needed for validation?
+            checker.tag = coords.Key;
+
+            // Update the board state. The space is occupied.
+            boardState[coords.Key] = true;
+
+            //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
+            //scene reloads.
+            DontDestroyOnLoad(checker);
         }
     }
 
@@ -217,6 +217,42 @@ public class GameManager : MonoBehaviourPunCallbacks
         { "H4", new Vector3(0.819f, 0.261f, -2.07f)},
         { "H6", new Vector3(-0.457f, 0.261f, -2.07f)},
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
+    };
+
+    public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
+    {
+        {"A1", false},
+        {"A3", false},
+        {"A5", false},
+        {"A7", false},
+        {"B2", false},
+        {"B4", false},
+        {"B6", false},
+        {"B8", false},
+        {"C1", false},
+        {"C3", false},
+        {"C5", false},
+        {"C7", false},
+        {"D2", false},
+        {"D4", false},
+        {"D6", false},
+        {"D8", false},
+        {"E1", false},
+        {"E3", false},
+        {"E5", false},
+        {"E7", false},
+        {"F2", false},
+        {"F4", false},
+        {"F6", false},
+        {"F8", false},
+        {"G1", false},
+        {"G3", false},
+        {"G5", false},
+        {"G7", false},
+        {"H2", false},
+        {"H4", false},
+        {"H6", false},
+        {"H8", false}
     };
 }
 

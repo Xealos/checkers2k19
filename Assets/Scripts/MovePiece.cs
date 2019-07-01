@@ -82,6 +82,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
                         // Validate movement here.
                         if (IsMoveValid(hit.transform.gameObject.name))
                         {
+                            _gameManager.boardState[hit.transform.gameObject.name] = true;
+                            _gameManager.boardState[this.gameObject.tag] = false;
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
@@ -101,29 +103,60 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         // Path 1 - Invalid - Adjacent space (forward) with a piece on it.
 
-        // Path 2 - Valid - Adjacent space (forward) with no piece on it.
-        if (isKing)
+        if (_gameManager.boardState[name])
         {
-            // TODO: Validate Movement if piece is a king.
+            return false;
         }
-        else
+
+        // Path 2 - Valid - Adjacent space (forward) with no piece on it.
+        // TODO TIM: Condense this into only 1 loop using local variables.
+        if (_gameManager._player1)
         {
-            
-            //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
-            // First, see if the game manager says it's okay to make a move.
-            if (_gameManager.IsMoveValid())
+            if (isKing)
             {
-                foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
+                // TODO: Validate Movement if piece is a king.
+            }
+            else
+            {
+
+                //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
+                // First, see if the game manager says it's okay to make a move.
+                if (_gameManager.IsMoveValid())
                 {
-                    if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                    foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
                     {
-                    
-                        return true;
+                        if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                        {
+
+                            return true;
+                        }
                     }
                 }
             }
-            
+        }
+        else
+        {
+            if (isKing)
+            {
+                // TODO: Validate Movement if piece is a king.
+            }
+            else
+            {
 
+                //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
+                // First, see if the game manager says it's okay to make a move.
+                if (_gameManager.IsMoveValid())
+                {
+                    foreach (KeyValuePair<string, List<string>> coords in validWhiteMovements_Regular)
+                    {
+                        if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
+                        {
+
+                            return true;
+                        }
+                    }
+                }
+            }
         }
 
         // Path 3 - Invalid - Adjacent space (backward)
@@ -327,6 +360,197 @@ public class MovePiece : MonoBehaviourPunCallbacks
             new List<string>(){
                 { "H6" },
                 { "H8" }
+            }
+        },
+    };
+
+    private Dictionary<string, List<string>> validWhiteMovements_Regular = new Dictionary<string, List<string>>(){
+        { "B2",
+            new List<string>(){
+                { "A1" },
+                { "A3" }
+            }
+        },
+
+        { "B4",
+            new List<string>(){
+                { "A3" },
+                { "A5" }
+            }
+        },
+
+        { "B6",
+            new List<string>(){
+                { "A5" },
+                { "A7" }
+            }
+        },
+
+        { "B8",
+            new List<string>(){
+                { "A7" }
+            }
+        },
+
+        { "C1",
+            new List<string>(){
+                { "B2" }
+            }
+        },
+
+        { "C3",
+            new List<string>(){
+                { "B2" },
+                { "B4" }
+            }
+        },
+
+        { "C5",
+            new List<string>(){
+                { "B4" },
+                { "B6" }
+            }
+        },
+
+        { "C7",
+            new List<string>(){
+                { "B6" },
+                { "B8" }
+            }
+        },
+
+        { "D2",
+            new List<string>(){
+                { "C1" },
+                { "C3" }
+            }
+        },
+
+        { "D4",
+            new List<string>(){
+                { "C3" },
+                { "C5" }
+            }
+        },
+
+        { "D6",
+            new List<string>(){
+                { "C5" },
+                { "C7" }
+            }
+        },
+
+        { "D8",
+            new List<string>(){
+                { "C7" }
+            }
+        },
+
+        { "E1",
+            new List<string>(){
+                { "D2" }
+            }
+        },
+
+        { "E3",
+            new List<string>(){
+                { "D2" },
+                { "D4" }
+            }
+        },
+
+        { "E5",
+            new List<string>(){
+                { "D4" },
+                { "D6" }
+            }
+        },
+
+        { "E7",
+            new List<string>(){
+                { "D6" },
+                { "D8" }
+            }
+        },
+
+        { "F2",
+            new List<string>(){
+                { "E1" },
+                { "E3" }
+            }
+        },
+
+        { "F4",
+            new List<string>(){
+                { "E3" },
+                { "E5" }
+            }
+        },
+
+        { "F6",
+            new List<string>(){
+                { "E5" },
+                { "E7" }
+            }
+        },
+
+        { "F8",
+            new List<string>(){
+                { "E7" }
+            }
+        },
+
+        { "G1",
+            new List<string>(){
+                { "F2" }
+            }
+        },
+
+        { "G3",
+            new List<string>(){
+                { "F2" },
+                { "F4" }
+            }
+        },
+
+        { "G5",
+            new List<string>(){
+                { "F4" },
+                { "F6" }
+            }
+        },
+
+        { "G7",
+            new List<string>(){
+                { "F6" },
+                { "F8" }
+            }
+        },
+
+        { "H2",
+            new List<string>(){
+                { "G1" },
+                { "G3" }
+            }
+        },
+
+        { "H4",
+            new List<string>(){
+                { "G3" },
+                { "G5" }
+            }
+        },
+
+        { "H6",
+            new List<string>(){
+                { "G5" },
+                { "G7" }
+            }
+        },
+
+        { "H8",
+            new List<string>(){
+                { "G7" }
             }
         },
     };
