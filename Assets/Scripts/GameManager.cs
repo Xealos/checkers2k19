@@ -278,8 +278,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public void OnTurnTimeEnds(int turn)
     {
         throw new System.NotImplementedException();
+    }
 
-  public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
+    public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
     {
         {"A1", false},
         {"A3", false},
@@ -313,6 +314,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {"H4", false},
         {"H6", false},
         {"H8", false},
-	}
+    };
 }
 
