@@ -2,7 +2,6 @@
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -54,7 +53,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
     
-    public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
+    public Dictionary<string, bool> boardState = new Dictionary<string, bool>
     {
         {"A1", false},
         {"A3", false},
@@ -200,9 +199,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         
             //TODO Tim: Update the game manager with the new board state
         
-            //If we've determined the move to be valid, send it to the other player and finish our turn
-            //TODO Brandon: What data should we send? The piece and new coordinates?
-            _turnManager.SendMove("Test", true);
+            // If the move is valid, send the updated board state and indicate the player has finished their turn. 
+            _turnManager.SendMove(boardState, true);
         }
 
         else
@@ -278,30 +276,37 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         // If the other player receives the callback, it's the beginning of their turn.
         else
         {
-            //TODO BRP: Send the move update back to the game manager for processing.
+            // Sync the board state after the opponent finishes their movements.
+            boardState = (Dictionary<string, bool>) move;
             MyTurn = true;
         }
     }
     
     public void OnTurnCompleted(int turn)
     {
-        //Start the next turn
+        // Start the next turn.
         _turnManager.BeginTurn();
     }
     
     public void OnTurnBegins(int turn)
     {
-        //Intentionally left blank
+        // Intentionally left blank
     }
 
     public void OnPlayerMove(Player player, int turn, object move)
     {
-        //Intentionally left blank
+        // If the opponent makes a move but hasn't ended their turn, sync the board state based on
+        // the opponent's intermediate message. 
+        if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
+        {
+            boardState = (Dictionary<string, bool>) move;
+        }
+
     }
 
     public void OnTurnTimeEnds(int turn)
     {
-        //Intentionally left blank
+        // Intentionally left blank
     }
 
     #endregion
