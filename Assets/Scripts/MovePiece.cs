@@ -112,7 +112,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         // Path 2 - Valid - Adjacent space (forward) with no piece on it.
         // TODO TIM: Condense this into only 1 loop using local variables.
-        if (_gameManager._player1)
+        if (_gameManager.player1)
         {
             if (isKing)
             {

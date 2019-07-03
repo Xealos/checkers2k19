@@ -52,7 +52,7 @@ public class InterfaceManager : MonoBehaviour
         }
 
         // Check to see whose turn it is and update the UI accordingly
-        if (GameManager.myTurn)
+        if (GameManager.MyTurn)
         {
             playerTurn.text = PhotonNetwork.NickName + "'s Turn";
         }
