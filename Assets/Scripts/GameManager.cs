@@ -191,26 +191,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         }
     }
 
-    public bool IsMoveValid()
+    public void UpdateGameState()
     {
         if (MyTurn)
         {
-            //TODO Tim: Add move validity logic here maybe? 
-        
-            //TODO Tim: Update the game manager with the new board state
-        
+            //TODO Brandon: Maybe the setting of the boardState can go here (pass the key and value as args to this
+            //TODO          function instead of setting it directly in the MovePiece class. 
+
             // If the move is valid, send the updated board state and indicate the player has finished their turn. 
             _turnManager.SendMove(boardState, true);
         }
-
-        else
-        {
-            // It's not the players turn, they can't move anything right now.
-            return false;
-        }
-
-
-        return true;
     }
     
     public void LeaveRoom()

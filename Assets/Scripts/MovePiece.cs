@@ -81,14 +81,21 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     }
                     else if (SPACE_NAMES.Contains(hit.transform.gameObject.name) && selected)
                     {
-                        // Validate movement here.
-                        if (IsMoveValid(hit.transform.gameObject.name))
+                        // If it's our turn, Validate movement here.
+                        if (GameManager.MyTurn &&
+                            IsMoveValid(hit.transform.gameObject.name))
                         {
+                            // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
+                            // TODO          to make the data structure private and have an accessor function in 
+                            // TODO          the game manager. 
                             _gameManager.boardState[hit.transform.gameObject.name] = true;
                             _gameManager.boardState[this.gameObject.tag] = false;
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
+                            
+                            // Tell the game manager to update the game state
+                            _gameManager.UpdateGameState();
                         }
                     }
                     else
@@ -120,20 +127,16 @@ public class MovePiece : MonoBehaviourPunCallbacks
             }
             else
             {
-
-                //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
                 // First, see if the game manager says it's okay to make a move.
-                if (_gameManager.IsMoveValid())
+                foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
                 {
-                    foreach (KeyValuePair<string, List<string>> coords in validBlackMovements_Regular)
+                    if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
                     {
-                        if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
-                        {
 
-                            return true;
-                        }
+                        return true;
                     }
                 }
+                
             }
         }
         else
@@ -144,18 +147,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
             }
             else
             {
-
-                //TODO Brandon & Tim: Figure out if we should consolidate the logic between these two functions
                 // First, see if the game manager says it's okay to make a move.
-                if (_gameManager.IsMoveValid())
+                foreach (KeyValuePair<string, List<string>> coords in validWhiteMovements_Regular)
                 {
-                    foreach (KeyValuePair<string, List<string>> coords in validWhiteMovements_Regular)
+                    if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
                     {
-                        if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
-                        {
-
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
