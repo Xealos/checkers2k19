@@ -2,10 +2,11 @@
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviourPunCallbacks
+public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 {
     public GameObject blackCheckerPrefab;
 
@@ -13,9 +14,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public Camera playerCamera;
     
-    private PunTurnManager _turnManager;
+    //private PunTurnManager _turnManager;
+    
+    private static PunTurnManager _turnManager;
 
-    private TurnManagerListeners _turnListeners;
+    //public TurnManagerListeners turnListeners;
 
     private static bool _instantiated;
 
@@ -23,17 +26,32 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        _turnManager = GetComponent<PunTurnManager>();
-        _turnListeners = GetComponent<TurnManagerListeners>();
+        _turnManager = this.gameObject.AddComponent<PunTurnManager>();
+        _turnManager.TurnManagerListener = this;
+        _turnManager.TurnDuration = 5f;
 
-        _turnManager.TurnManagerListener = _turnListeners;
-        
         // Only execute if we haven't instantiated our checkers yet. This prevents the player 1 entering the room
         // from instantiating another set of objects when player 2 enters. 
         if (_instantiated == false)
         {
+            _turnManager.BeginTurn();
+            
             // If we're the first player to join, set us to player 1. 
             _player1 = PhotonNetwork.CurrentRoom.PlayerCount == 1;
+            
+            if (_player1)
+            {
+                name = "GameManager Player 1";
+            }
+            else
+            {
+                name = "Game Manager PLayer 2";
+            }
+
+            //_turnManager = GetComponent<PunTurnManager>();
+            //turnListeners = GetComponent<TurnManagerListeners>();
+
+            //_turnManager.TurnManagerListener = turnListeners;
 
             SetupCheckers(_player1);
 
@@ -42,14 +60,20 @@ public class GameManager : MonoBehaviourPunCallbacks
             SetupTurns(_player1);
             
             _instantiated = true;
-
         }
-        
+
+        name = "GameManager Not Instantiated";
+
+    }
+    
+    public void Update()
+    {
+        Debug.LogFormat("Current Turn Status: {0}", myTurn);
     }
 
     public bool IsMoveValid()
     {
-        if (_turnListeners.myTurn)
+        if (myTurn)
         {
             //TODO Tim: Add move validity logic here maybe? 
         
@@ -57,7 +81,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         
             //If we've determined the move to be valid, send it to the other player and finish our turn
             //TODO Brandon: What data should we send? The piece and new coordinates?
-            _turnManager.SendMove(null, true);
+            _turnManager.SendMove("Test", true);
         }
 
         else
@@ -73,6 +97,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     #region Photon Callbacks
     public override void OnLeftRoom()
     {
+        _instantiated = false;
         SceneManager.LoadScene(0);
     }
 
@@ -181,11 +206,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (player1)
         {
-            _turnListeners.myTurn = true;
+            myTurn = true;
         }
         else
         {
-            _turnListeners.myTurn = false;
+            myTurn = false;
         }
     }
 
@@ -218,8 +243,43 @@ public class GameManager : MonoBehaviourPunCallbacks
         { "H6", new Vector3(-0.457f, 0.261f, -2.07f)},
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
+    public static bool myTurn;
 
-    public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
+    public void OnPlayerFinished(Player player, int turn, object move)
+    {
+        // If the local player drove the callback, then it's the end of their turn. 
+        if (player.UserId == PhotonNetwork.LocalPlayer.UserId)
+        {
+            myTurn = false;
+        }
+        // If the other player receives the callback, it's the beginning of their turn.
+        else
+        {
+            //TODO BRP: Send the move update back to the game manager for processing.
+            myTurn = true;
+        }
+    }
+
+    public void OnTurnBegins(int turn)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnTurnCompleted(int turn)
+    {
+        _turnManager.BeginTurn();
+    }
+
+    public void OnPlayerMove(Player player, int turn, object move)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnTurnTimeEnds(int turn)
+    {
+        throw new System.NotImplementedException();
+
+  public Dictionary<string, bool> boardState = new Dictionary<string, bool>()
     {
         {"A1", false},
         {"A3", false},
@@ -252,7 +312,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {"H2", false},
         {"H4", false},
         {"H6", false},
-        {"H8", false}
-    };
+        {"H8", false},
+	}
 }
 

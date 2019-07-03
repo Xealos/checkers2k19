@@ -13,6 +13,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
     
     public bool isKing;
 
+    private static bool _instantiated;
+
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
             "A1",
@@ -49,7 +51,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
             "H8",
         };
 
-    void Start()
+    void Awake()
     {
         //Get the game manager component script
         _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
