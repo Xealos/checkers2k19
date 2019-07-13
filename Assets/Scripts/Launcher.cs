@@ -79,7 +79,11 @@ public class Launcher : MonoBehaviourPunCallbacks
         }
         else
         {
-             // #Critical, we must first and foremost connect to Photon Online Server.
+            // TODO Brandon: Hard-coding US West region for now to ensure we are connecting all instances to the 
+            // TODO          same servers for testing. 
+            PhotonNetwork.PhotonServerSettings.AppSettings.FixedRegion = "usw";
+            
+             // We must first and foremost connect to Photon Online Server.
             PhotonNetwork.GameVersion = gameVersion;
             PhotonNetwork.ConnectUsingSettings();
         }
