@@ -158,7 +158,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         string prefabName;
 
         // TODO Brandon: Maybe let the player creating the room pick the color they want. 
-        // TODO Tim: This logic is repetitive. Recommend assigning local variables and consolidating to one foreach loop.
         if (player1)
         {
             test = _blackSpawnPoints;
