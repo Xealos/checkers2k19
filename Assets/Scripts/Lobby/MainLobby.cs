@@ -1,16 +1,35 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 public class MainLobby : MonoBehaviourPunCallbacks
 {
+    public GameObject mainMenu;
+    public GameObject lobbyMenu;
+    public GameObject connectingMenu;
+    
+    public GameObject createRoomText; 
+    
     private readonly byte _maxPlayersPerRoom = 2;
     private readonly string _gameVersion = "1";
-    private bool _isConnected;
+    private static bool _isConnectedToRoom;
 
     void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        // Check to see whether we are coming back to the Lobby from a match or entering the Lobby 
+        // for the very first time. 
+        if (_isConnectedToRoom)
+        {
+            // We are coming back out of a room, so reset the flag.
+            _isConnectedToRoom = false;
+            
+            // Make sure we come back to the lobby menu since we're already logged in. 
+            mainMenu.SetActive(false);
+            lobbyMenu.SetActive(true);
+        }
     }
 
     public void OnClickConnectButton()
@@ -21,6 +40,20 @@ public class MainLobby : MonoBehaviourPunCallbacks
         
         PhotonNetwork.GameVersion = _gameVersion;
         PhotonNetwork.ConnectUsingSettings();
+    }
+
+    public void OnClickCreateButton()
+    {
+        Text roomName = createRoomText.GetComponent<Text>();
+        
+        if (roomName.text != string.Empty)
+        {
+            RoomOptions options = new RoomOptions{MaxPlayers = _maxPlayersPerRoom};
+
+            PhotonNetwork.CreateRoom(roomName.text, options);
+
+            PhotonNetwork.JoinRoom(roomName.text);
+        }
     }
 
     public void OnClickRandomButton()
@@ -37,9 +70,21 @@ public class MainLobby : MonoBehaviourPunCallbacks
     }
     
     #region MonoBehaviorPunCallbacks Callbacks
-    
+
+    public override void OnConnectedToMaster()
+    {
+        if(!_isConnectedToRoom)
+        {
+            // Once a connection has been established, display the lobby menu.
+            connectingMenu.SetActive(false);
+            lobbyMenu.SetActive(true);   
+        }
+    }
+
     public override void OnJoinedRoom()
     {
+        _isConnectedToRoom = true;
+        
         if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
         {
             Debug.Log("Loading Checkerboard Scene...");

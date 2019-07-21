@@ -1149,8 +1149,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
-          type: 3}
+      - m_Target: {fileID: 1230810081}
         m_MethodName: LeaveRoom
         m_Mode: 1
         m_Arguments:
@@ -1940,7 +1939,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 
 --- !u!222 &1039924327
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2145,6 +2144,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 455c4d7b6da52634699744165a02e403, type: 3}
+--- !u!114 &1230810081 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
+    type: 3}
+  m_PrefabInstance: {fileID: 1230810080}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962854633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0d4d8ca905e3e644ad5e66d0208a09c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1245162348
 GameObject:
   m_ObjectHideFlags: 0
