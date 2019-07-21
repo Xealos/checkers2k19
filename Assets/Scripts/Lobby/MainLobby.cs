@@ -4,10 +4,10 @@ using Photon.Realtime;
 
 public class MainLobby : MonoBehaviourPunCallbacks
 {
-    private byte _maxPlayersPerRoom = 2;
+    private readonly byte _maxPlayersPerRoom = 2;
+    private readonly string _gameVersion = "1";
     private bool _isConnected;
-    private string _gameVersion = "1";
-    
+
     void Awake()
     {
         PhotonNetwork.AutomaticallySyncScene = true;
@@ -30,6 +30,11 @@ public class MainLobby : MonoBehaviourPunCallbacks
             PhotonNetwork.JoinRandomRoom(); 
         }
     }
+
+    public void OnClickLogoutButton()
+    {
+        PhotonNetwork.Disconnect();
+    }
     
     #region MonoBehaviorPunCallbacks Callbacks
     
@@ -45,6 +50,11 @@ public class MainLobby : MonoBehaviourPunCallbacks
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
         PhotonNetwork.CreateRoom(null, new RoomOptions{ MaxPlayers = _maxPlayersPerRoom });
+    }
+    
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
     }
 
     #endregion
