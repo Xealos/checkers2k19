@@ -61,6 +61,11 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButtonDown(0))
         {
+            // Don't let player move a piece if nobody else has connected yet. 
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+            {
+                return;
+            }
 
             // Only let the player move the piece if they instantiated it. 
             if (!photonView.IsMine && PhotonNetwork.IsConnected)
