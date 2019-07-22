@@ -1,6 +1,7 @@
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 using UnityEngine.UI;
 
 public class MainLobby : MonoBehaviourPunCallbacks
@@ -8,7 +9,9 @@ public class MainLobby : MonoBehaviourPunCallbacks
     public GameObject mainMenu;
     public GameObject lobbyMenu;
     public GameObject connectingMenu;
+    public GameObject playerInfo;
     
+    public GameObject playerText;
     public GameObject createRoomText; 
     
     private readonly byte _maxPlayersPerRoom = 2;
@@ -26,9 +29,13 @@ public class MainLobby : MonoBehaviourPunCallbacks
             // We are coming back out of a room, so reset the flag.
             _isConnectedToRoom = false;
             
+            // Set the nickname in the menu so they remember who they are.
+            playerText.GetComponent<TextMeshProUGUI>().text = PhotonNetwork.NickName;
+            
             // Make sure we come back to the lobby menu since we're already logged in. 
             mainMenu.SetActive(false);
             lobbyMenu.SetActive(true);
+            playerInfo.SetActive(true);
         }
     }
 
@@ -78,6 +85,10 @@ public class MainLobby : MonoBehaviourPunCallbacks
             // Once a connection has been established, display the lobby menu.
             connectingMenu.SetActive(false);
             lobbyMenu.SetActive(true);   
+            playerInfo.SetActive(true);
+            
+            // Set the nickname in the menu so they remember who they are.
+            playerText.GetComponent<TextMeshProUGUI>().text = PhotonNetwork.NickName;
         }
     }
 
