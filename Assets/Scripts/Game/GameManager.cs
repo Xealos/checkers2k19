@@ -20,7 +20,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     private static PunTurnManager _turnManager;
 
     private static bool _instantiated;
-    
+
+    public static bool isGameOver;
+
     private static readonly Dictionary<string, Vector3> BlackSpawnPoints = new Dictionary<string, Vector3>
     {
         { "A1", new Vector3(2.765f, 0.261f, 2.422f)},
@@ -89,6 +91,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {"H8", true}
     };
     
+    private enum GameState
+    {
+        WAITING_FOR_PLAYER,
+        PLAYER_WIN,
+        OPPONENT_WIN,
+        OPPONENT_FORFEIT
+    }
+
     void Start()
     {
         _turnManager = gameObject.AddComponent<PunTurnManager>();
@@ -119,6 +129,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             SetupTurns(player1);
             
             _instantiated = true;
+        }
+    }
+
+    void Update()
+    {
+        if (isGameOver)
+        {
+            GameOver();
         }
     }
     
@@ -216,6 +234,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("CheckerboardScene");
     }
+    
+    private void GameOver()
+    {
+        
+    }
 
     #region Photon Callbacks
     public override void OnLeftRoom()
@@ -240,7 +263,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public override void OnPlayerLeftRoom(Player other)
     {
         // seen when other disconnects
-        Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
+        Debug.LogFormat("{0} has left the game!", other.NickName);
 
 
         if (PhotonNetwork.IsMasterClient)
@@ -330,5 +353,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     }
 
     #endregion
+    
 }
 

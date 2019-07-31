@@ -39,6 +39,8 @@ TagManager:
   - B6
   - B8
   - GameManager
+  - RoomName
+  - Players
   layers:
   - Default
   - TransparentFX
