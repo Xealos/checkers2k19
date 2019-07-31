@@ -93,8 +93,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
                             // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
                             // TODO          to make the data structure private and have an accessor function in 
                             // TODO          the game manager. 
-                            _gameManager.boardState[hit.transform.gameObject.name] = true;
-                            _gameManager.boardState[this.gameObject.tag] = false;
+                            GameManager.BoardState[hit.transform.gameObject.name] = true;
+                            GameManager.BoardState[this.gameObject.tag] = false;
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
@@ -120,7 +120,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         // Path 1 - Invalid - Adjacent space (forward) with a piece on it.
 
-        if (_gameManager.boardState[name])
+        if (GameManager.BoardState[name])
         {
             return false;
         }
@@ -177,7 +177,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
                         // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
                         // This must be changed to check for opposing pieces.
-                        if (_gameManager.boardState[jumpOverSpace])
+                        if (GameManager.BoardState[jumpOverSpace])
                         {
                             return true;
                         }
@@ -192,7 +192,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
                         // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
                         // This must be changed to check for opposing pieces.
-                        if (_gameManager.boardState[jumpOverSpace])
+                        if (GameManager.BoardState[jumpOverSpace])
                         {
                             return true;
                         }
