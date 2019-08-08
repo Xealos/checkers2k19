@@ -183,7 +183,6 @@ public class MainLobby : MonoBehaviourPunCallbacks
         {
             UpdateRoomListView();
         }
-
     }
 
     #endregion
