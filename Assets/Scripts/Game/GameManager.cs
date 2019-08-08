@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using System;
+using Photon.Pun;
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
@@ -20,7 +21,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     private static PunTurnManager _turnManager;
 
     private static bool _instantiated;
-    
+
+    private static GameState _gameState;
+
     private static readonly Dictionary<string, Vector3> BlackSpawnPoints = new Dictionary<string, Vector3>
     {
         { "A1", new Vector3(2.765f, 0.261f, 2.422f)},
@@ -89,6 +92,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {"H8", true}
     };
     
+    private enum GameState
+    {
+        WaitingForPlayer,
+        PlayingGame,
+        PlayerWin,
+        OpponentWin,
+        OpponentForfeit
+    }
+
     void Start()
     {
         _turnManager = gameObject.AddComponent<PunTurnManager>();
@@ -106,10 +118,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             if (player1)
             {
                 name = "GameManager Player 1";
+                
+                // We'll need to wait for another player to enter before continuing. 
+                _gameState = GameState.WaitingForPlayer;
             }
             else
             {
                 name = "Game Manager PLayer 2";
+                
+                // We know another player is here, so let's start allowing play. 
+                _gameState = GameState.PlayingGame;
             }
 
             SetupCheckers(player1);
@@ -119,6 +137,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             SetupTurns(player1);
             
             _instantiated = true;
+        }
+    }
+
+    void Update()
+    {
+        switch (_gameState)
+        {
+            case GameState.WaitingForPlayer when PhotonNetwork.CurrentRoom.PlayerCount == 2:
+                _gameState = GameState.PlayingGame;
+                break;
+            case GameState.OpponentForfeit:
+                //Wait for another player to enter the room 
+                //TODO Brandon: Do we want to wait for another player or just end the game? 
+                _gameState = GameState.WaitingForPlayer;
+                break;
+            case GameState.PlayerWin:
+                GameOver();
+                break;
         }
     }
     
@@ -190,6 +226,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         }
     }
 
+    public bool GamePlayAllowed()
+    {
+        if(PhotonNetwork.IsConnected && MyTurn && _gameState == GameState.PlayingGame)
+        {
+            return true; 
+        }
+
+        return false;
+    }
+
     public void UpdateGameState()
     {
         if (MyTurn)
@@ -216,6 +262,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("CheckerboardScene");
     }
+    
+    private void GameOver()
+    {
+        
+    }
 
     #region Photon Callbacks
     public override void OnLeftRoom()
@@ -227,7 +278,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public override void OnPlayerEnteredRoom(Player other)
     {
         // not seen if you're the player connecting
-        Debug.LogFormat("OnPlayerEnteredRoom () {0}", other.NickName);
+        Debug.LogFormat("{0} has entered the match!", other.NickName);
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -240,15 +291,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public override void OnPlayerLeftRoom(Player other)
     {
         // seen when other disconnects
-        Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
+        Debug.LogFormat("{0} has left the match!", other.NickName);
 
-
-        if (PhotonNetwork.IsMasterClient)
-        {
-            Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
-
-            LoadArena();
-        }
+        // Opponent has left the game, we're no longer allowing play at this point.
+        _gameState = GameState.OpponentForfeit;
     }
 
     #endregion
@@ -330,5 +376,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     }
 
     #endregion
+    
 }
 

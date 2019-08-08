@@ -124,8 +124,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40965ca584ba8744f9b6a065b48d874c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 1268684829983383721, guid: 455c4d7b6da52634699744165a02e403,
-    type: 3}
   playerPhotonView: {fileID: 8492123628440828609}
   selected: 0
   isKing: 0
