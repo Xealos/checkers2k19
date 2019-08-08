@@ -61,12 +61,13 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // Don't let player move a piece if nobody else has connected yet. 
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+            // First, check with the Game Manager to see if we're allowed to continue
+            if (_gameManager.GamePlayAllowed() == false)
             {
+                // Game Manager said no, so there's no sense in continuing. 
                 return;
             }
-
+            
             // Only let the player move the piece if they instantiated it. 
             if (!photonView.IsMine && PhotonNetwork.IsConnected)
             {
@@ -87,8 +88,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     else if (SPACE_NAMES.Contains(hit.transform.gameObject.name) && selected)
                     {
                         // If it's our turn, Validate movement here.
-                        if (GameManager.MyTurn &&
-                            IsMoveValid(hit.transform.gameObject.name))
+                        if (IsMoveValid(hit.transform.gameObject.name))
                         {
                             // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
                             // TODO          to make the data structure private and have an accessor function in 
