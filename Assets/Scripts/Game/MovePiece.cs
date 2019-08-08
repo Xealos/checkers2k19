@@ -11,7 +11,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     public bool selected;
 
-    public bool isKing;
+    public static bool isKing;
 
     private static bool _instantiated;
 
@@ -126,7 +126,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
         }
 
         // Path 2 - Valid - Adjacent space (forward) with no piece on it.
-        if (_gameManager.player1)
+        if (isKing)
+        {
+            validMovements = validKingMovements;
+            validJumps = null; //validKingJumps;
+        }
+        else if (_gameManager.player1)
         {
             validMovements = validBlackMovements_Regular;
             validJumps = validBlackJumps;
@@ -137,66 +142,36 @@ public class MovePiece : MonoBehaviourPunCallbacks
             validJumps = validWhiteJumps;
         }
 
-        if (isKing)
+        // First, see if the game manager says it's okay to make a move.
+        foreach (KeyValuePair<string, List<string>> coords in validMovements)
         {
-            // TODO: Validate Movement if piece is a king.
-        }
-        else
-        {
-            // First, see if the game manager says it's okay to make a move.
-            foreach (KeyValuePair<string, List<string>> coords in validMovements)
+            if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
             {
-                if (this.gameObject.tag.Equals(coords.Key) && coords.Value.Contains(name))
-                {
 
-                    return true;
-                }
+                return true;
             }
-
         }
 
-        // Valid - 2 spaces ahead with only an opposing piece in between.
-        if (isKing)
+        foreach(JumpPositions jumps in validJumps)
         {
-            // TODO: Validate jumps if piece is a king.
-        }
-        else
-        {
-            foreach(JumpPositions jumps in validJumps)
-            {
-                 // If we're on the current position...
-                if (this.gameObject.tag.Equals(jumps.getCurrentPosition())){
+                // If we're on the current position...
+            if (this.gameObject.tag.Equals(jumps.getCurrentPosition())){
 
-                    string jumpOverSpace;
+                string jumpOverSpace;
 
-                    // and name is a key in the leftJump dictionary...
-                    if (jumps.getLeftJump().ContainsKey(name)) {
+                // and name is a key in the leftJump dictionary...
+                if (jumps.getJumps().ContainsKey(name)) {
 
-                        jumpOverSpace = jumps.getLeftJump()[name];
-                        // Then the associated value must be occupied by an opposing piece.
+                    jumpOverSpace = jumps.getJumps()[name];
+                    // Then the associated value must be occupied by an opposing piece.
 
-                        // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
-                        // This must be changed to check for opposing pieces.
-                        if (GameManager.BoardState[jumpOverSpace])
-                        {
-                            return true;
-                        }
-
-                    }
-
-                    // ...or the rightJump dictionary...
-                    if (jumps.getRightJump().ContainsKey(name))
+                    // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
+                    // This must be changed to check for opposing pieces.
+                    if (GameManager.BoardState[jumpOverSpace])
                     {
-                        jumpOverSpace = jumps.getRightJump()[name];
-                        // Then the associated value must be occupied by an opposing piece.
-
-                        // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
-                        // This must be changed to check for opposing pieces.
-                        if (GameManager.BoardState[jumpOverSpace])
-                        {
-                            return true;
-                        }
+                        return true;
                     }
+
                 }
             }
         }
@@ -213,14 +188,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
     private class JumpPositions {
         private string currentPosition;
         // Key is jump destination, value is the position in between.
-        private Dictionary<string, string> leftJump;
-        private Dictionary<string, string> rightJump;
+        private Dictionary<string, string> jumps;
 
-        public JumpPositions(string currentPosition, Dictionary<string, string> leftJump, Dictionary<string, string> rightJump)
+        public JumpPositions(string currentPosition, Dictionary<string, string> jumps)
         {
             this.currentPosition = currentPosition;
-            this.leftJump = leftJump;
-            this.rightJump = rightJump;
+            this.jumps = jumps;
         }
 
         public string getCurrentPosition()
@@ -228,14 +201,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
             return currentPosition;
         }
 
-        public Dictionary<string, string> getLeftJump()
+        public Dictionary<string, string> getJumps()
         {
-            return leftJump;
-        }
-
-        public Dictionary<string, string> getRightJump()
-        {
-            return rightJump;
+            return jumps;
         }
     }
 
@@ -243,44 +211,32 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         { new JumpPositions("H2",
             new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
-            new Dictionary<string, string>(){
                 { "F4", "G3" }
             })
         },
 
         { new JumpPositions("H4",
             new Dictionary<string, string>(){
-                { "F2", "G3" }
-            },
-            new Dictionary<string, string>(){
+                { "F2", "G3" },
                 { "F6", "G5" }
             })
         },
 
         { new JumpPositions("H6",
             new Dictionary<string, string>(){
-                { "F4", "G5" }
-            },
-            new Dictionary<string, string>(){
+                { "F4", "G5" },
                 { "F8", "G7" }
             })
         },
 
         { new JumpPositions("H8",
             new Dictionary<string, string>(){
-                { "C5", "B6" }
-            },
-            new Dictionary<string, string>(){
+                { "C5", "B6" },
                 { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("G1",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "E3", "F2" }
             })
@@ -288,18 +244,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("G3",
             new Dictionary<string, string>(){
-                { "E1", "F2" }
-            },
-            new Dictionary<string, string>(){
+                { "E1", "F2" },
                 { "E5", "F4" }
             })
         },
 
         { new JumpPositions("G5",
             new Dictionary<string, string>(){
-                { "E3", "F4" }
-            },
-            new Dictionary<string, string>(){
+                { "E3", "F4" },
                 { "E7", "F6" }
             })
         },
@@ -307,16 +259,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("G7",
             new Dictionary<string, string>(){
                 { "E5", "F6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("F2",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "D4", "E3" }
             })
@@ -324,18 +270,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("F4",
             new Dictionary<string, string>(){
-                { "D2", "E3" }
-            },
-            new Dictionary<string, string>(){
+                { "D2", "E3" },
                 { "D6", "E5" }
             })
         },
 
         { new JumpPositions("F6",
             new Dictionary<string, string>(){
-                { "D4", "E5" }
-            },
-            new Dictionary<string, string>(){
+                { "D4", "E5" },
                 { "D8", "E7" }
             })
         },
@@ -343,16 +285,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("F8",
             new Dictionary<string, string>(){
                 { "E7", "D6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("E1",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "C3", "D2" }
             })
@@ -360,18 +296,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("E3",
             new Dictionary<string, string>(){
-                { "C1", "D2" }
-            },
-            new Dictionary<string, string>(){
+                { "C1", "D2" },
                 { "C5", "D4" }
             })
         },
 
         { new JumpPositions("E5",
             new Dictionary<string, string>(){
-                { "C3", "D4" }
-            },
-            new Dictionary<string, string>(){
+                { "C3", "D4" },
                 { "C7", "D6" }
             })
         },
@@ -379,16 +311,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("E7",
             new Dictionary<string, string>(){
                 { "C5", "D6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("D2",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "B4", "C3" }
             })
@@ -396,18 +322,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("D4",
             new Dictionary<string, string>(){
-                { "B2", "C3" }
-            },
-            new Dictionary<string, string>(){
+                { "B2", "C3" },
                 { "B6", "C5" }
             })
         },
 
         { new JumpPositions("D6",
             new Dictionary<string, string>(){
-                { "B4", "C5" }
-            },
-            new Dictionary<string, string>(){
+                { "B4", "C5" },
                 { "B8", "C7" }
             })
         },
@@ -415,16 +337,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("D8",
             new Dictionary<string, string>(){
                 { "B6", "C7" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("C1",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "A3", "B2" }
             })
@@ -432,18 +348,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("C3",
             new Dictionary<string, string>(){
-                { "A1", "B2" }
-            },
-            new Dictionary<string, string>(){
+                { "A1", "B2" },
                 { "A5", "B4" }
             })
         },
 
         { new JumpPositions("C5",
             new Dictionary<string, string>(){
-                { "A3", "B4" }
-            },
-            new Dictionary<string, string>(){
+                { "A3", "B4" },
                 { "A7", "B6" }
             })
         },
@@ -451,9 +363,6 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("C7",
             new Dictionary<string, string>(){
                 { "A5", "B6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         }
     };
@@ -462,27 +371,20 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         { new JumpPositions("A1",
             new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
-            new Dictionary<string, string>(){
                 { "C3", "B2" }
             })
         },
 
         { new JumpPositions("A3",
             new Dictionary<string, string>(){
-                { "C1", "B2" }
-            },
-            new Dictionary<string, string>(){
+                { "C1", "B2" },
                 { "C5", "B4" }
             })
         },
 
         { new JumpPositions("A5",
             new Dictionary<string, string>(){
-                { "C3", "B4" }
-            },
-            new Dictionary<string, string>(){
+                { "C3", "B4" },
                 { "C7", "B6" }
             })
         },
@@ -490,16 +392,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("A7",
             new Dictionary<string, string>(){
                 { "C5", "B6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("B2",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "D4", "C3" }
             })
@@ -507,18 +403,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("B4",
             new Dictionary<string, string>(){
-                { "D2", "C3" }
-            },
-            new Dictionary<string, string>(){
+                { "D2", "C3" },
                 { "D6", "C5" }
             })
         },
 
         { new JumpPositions("B6",
             new Dictionary<string, string>(){
-                { "D4", "C5" }
-            },
-            new Dictionary<string, string>(){
+                { "D4", "C5" },
                 { "D8", "C7" }
             })
         },
@@ -526,16 +418,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("B8",
             new Dictionary<string, string>(){
                 { "D6", "C7" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("C1",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "E3", "D2" }
             })
@@ -543,18 +429,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("C3",
             new Dictionary<string, string>(){
-                { "E1", "D2" }
-            },
-            new Dictionary<string, string>(){
+                { "E1", "D2" },
                 { "E5", "D4" }
             })
         },
 
         { new JumpPositions("C5",
             new Dictionary<string, string>(){
-                { "E3", "D4" }
-            },
-            new Dictionary<string, string>(){
+                { "E3", "D4" },
                 { "E7", "D6" }
             })
         },
@@ -562,16 +444,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("C7",
             new Dictionary<string, string>(){
                 { "E5", "D6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("D2",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "F4", "E3" }
             })
@@ -579,18 +455,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("D4",
             new Dictionary<string, string>(){
-                { "F2", "E3" }
-            },
-            new Dictionary<string, string>(){
+                { "F2", "E3" },
                 { "F6", "E5" }
             })
         },
 
         { new JumpPositions("D6",
             new Dictionary<string, string>(){
-                { "F4", "E5" }
-            },
-            new Dictionary<string, string>(){
+                { "F4", "E5" },
                 { "F8", "E7" }
             })
         },
@@ -598,16 +470,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("D8",
             new Dictionary<string, string>(){
                 { "F6", "E7" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("E1",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "G3", "F2" }
             })
@@ -615,18 +481,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("E3",
             new Dictionary<string, string>(){
-                { "G1", "F2" }
-            },
-            new Dictionary<string, string>(){
+                { "G1", "F2" },
                 { "G5", "F4" }
             })
         },
 
         { new JumpPositions("E5",
             new Dictionary<string, string>(){
-                { "G3", "F4" }
-            },
-            new Dictionary<string, string>(){
+                { "G3", "F4" },
                 { "G7", "F6" }
             })
         },
@@ -634,16 +496,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("E7",
             new Dictionary<string, string>(){
                 { "G5", "F6" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         },
 
         { new JumpPositions("F2",
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
-            },
             new Dictionary<string, string>(){
                 { "H4", "G3" }
             })
@@ -651,18 +507,14 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
         { new JumpPositions("F4",
             new Dictionary<string, string>(){
-                { "H2", "G3" }
-            },
-            new Dictionary<string, string>(){
+                { "H2", "G3" },
                 { "H6", "G5" }
             })
         },
 
         { new JumpPositions("F6",
             new Dictionary<string, string>(){
-                { "H4", "G5" }
-            },
-            new Dictionary<string, string>(){
+                { "H4", "G5" },
                 { "H8", "G7" }
             })
         },
@@ -670,9 +522,6 @@ public class MovePiece : MonoBehaviourPunCallbacks
         { new JumpPositions("F8",
             new Dictionary<string, string>(){
                 { "H6", "G7" }
-            },
-            new Dictionary<string, string>(){
-                { string.Empty, string.Empty }
             })
         }
     };
@@ -1028,6 +877,267 @@ public class MovePiece : MonoBehaviourPunCallbacks
             new List<string>(){
                 { "F6" },
                 { "F8" }
+            }
+        },
+
+        { "H2",
+            new List<string>(){
+                { "G1" },
+                { "G3" }
+            }
+        },
+
+        { "H4",
+            new List<string>(){
+                { "G3" },
+                { "G5" }
+            }
+        },
+
+        { "H6",
+            new List<string>(){
+                { "G5" },
+                { "G7" }
+            }
+        },
+
+        { "H8",
+            new List<string>(){
+                { "G7" }
+            }
+        },
+    };
+
+    private Dictionary<string, List<string>> validKingMovements = new Dictionary<string, List<string>>()
+    {
+        { "A1",
+            new List<string>(){
+                { "B2" }
+            }
+        },
+
+        { "A3",
+            new List<string>(){
+                { "B2" },
+                { "B4" }
+            }
+        },
+
+        { "A5",
+            new List<string>(){
+                { "B4" },
+                { "B6" }
+            }
+        },
+
+        { "A7",
+            new List<string>(){
+                { "B6" },
+                { "B8" }
+            }
+        },
+
+        { "B2",
+            new List<string>(){
+                { "A1" },
+                { "A3" },
+                { "C1" },
+                { "C3" }
+            }
+        },
+
+        { "B4",
+            new List<string>(){
+                { "A3" },
+                { "A5" },
+                { "C3" },
+                { "C5" }
+            }
+        },
+
+        { "B6",
+            new List<string>(){
+                { "A5" },
+                { "A7" },
+                { "C5" },
+                { "C7" }
+            }
+        },
+
+        { "B8",
+            new List<string>(){
+                { "A7" },
+                { "C7" }
+            }
+        },
+
+        { "C1",
+            new List<string>(){
+                { "B2" },
+                { "D2" }
+            }
+        },
+
+        { "C3",
+            new List<string>(){
+                { "B2" },
+                { "B4" },
+                { "D2" },
+                { "D4" }
+            }
+        },
+
+        { "C5",
+            new List<string>(){
+                { "B4" },
+                { "B6" },
+                { "D4" },
+                { "D6" }
+            }
+        },
+
+        { "C7",
+            new List<string>(){
+                { "B6" },
+                { "B8" },
+                { "D6" },
+                { "D8" }
+            }
+        },
+
+        { "D2",
+            new List<string>(){
+                { "C1" },
+                { "C3" },
+                { "E1" },
+                { "E3" }
+            }
+        },
+
+        { "D4",
+            new List<string>(){
+                { "C3" },
+                { "C5" },
+                { "E3" },
+                { "E5" }
+            }
+        },
+
+        { "D6",
+            new List<string>(){
+                { "C5" },
+                { "C7" },
+                { "E5" },
+                { "E7" }
+            }
+        },
+
+        { "D8",
+            new List<string>(){
+                { "C7" },
+                { "E7" }
+            }
+        },
+
+        { "E1",
+            new List<string>(){
+                { "D2" },
+                { "F2" }
+            }
+        },
+
+        { "E3",
+            new List<string>(){
+                { "D2" },
+                { "D4" },
+                { "F2" },
+                { "F4" }
+            }
+        },
+
+        { "E5",
+            new List<string>(){
+                { "D4" },
+                { "D6" },
+                { "F4" },
+                { "F6" }
+            }
+        },
+
+        { "E7",
+            new List<string>(){
+                { "D6" },
+                { "D8" },
+                { "F6" },
+                { "F8" }
+            }
+        },
+
+        { "F2",
+            new List<string>(){
+                { "E1" },
+                { "E3" },
+                { "G1" },
+                { "G3" }
+            }
+        },
+
+        { "F4",
+            new List<string>(){
+                { "E3" },
+                { "E5" },
+                { "G3" },
+                { "G5" }
+            }
+        },
+
+        { "F6",
+            new List<string>(){
+                { "E5" },
+                { "E7" },
+                { "G5" },
+                { "G7" }
+            }
+        },
+
+        { "F8",
+            new List<string>(){
+                { "E7" },
+                { "G7" }
+            }
+        },
+
+        { "G1",
+            new List<string>(){
+                { "F2" },
+                { "H2" }
+            }
+        },
+
+        { "G3",
+            new List<string>(){
+                { "F2" },
+                { "F4" },
+                { "H2" },
+                { "H4" }
+            }
+        },
+
+        { "G5",
+            new List<string>(){
+                { "F4" },
+                { "F6" },
+                { "H4" },
+                { "H6" }
+            }
+        },
+
+        { "G7",
+            new List<string>(){
+                { "F6" },
+                { "F8" },
+                { "H6" },
+                { "H8" }
             }
         },
 
