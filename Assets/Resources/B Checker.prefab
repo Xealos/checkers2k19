@@ -31,7 +31,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1562297157980949021}
   m_LocalRotation: {x: 0.4928717, y: 0.5070281, z: 0.50702924, w: -0.49287057}
-  m_LocalPosition: {x: 0.82908547, y: 0.26111102, z: 2.3842354}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 27.784277, y: 27.784225, z: 6.2072597}
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,6 +127,7 @@ MonoBehaviour:
   playerPhotonView: {fileID: -6940931249244627396}
   selected: 0
   isKing: 0
+  debugLocal: 0
 --- !u!114 &-6940931249244627396
 MonoBehaviour:
   m_ObjectHideFlags: 0
