@@ -11,7 +11,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     public bool selected;
 
-    public static bool isKing;
+    public bool isKing;
+
+    public bool debugLocal;
 
     private static bool _instantiated;
 
@@ -61,17 +63,20 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButtonDown(0))
         {
-            // First, check with the Game Manager to see if we're allowed to continue
-            if (_gameManager.GamePlayAllowed() == false)
+            if (debugLocal == false)
             {
-                // Game Manager said no, so there's no sense in continuing. 
-                return;
-            }
+                // First, check with the Game Manager to see if we're allowed to continue
+                if (_gameManager.GamePlayAllowed() == false)
+                {
+                    // Game Manager said no, so there's no sense in continuing. 
+                    return;
+                }
             
-            // Only let the player move the piece if they instantiated it. 
-            if (!photonView.IsMine && PhotonNetwork.IsConnected)
-            {
-                return;
+                // Only let the player move the piece if they instantiated it. 
+                if (!photonView.IsMine && PhotonNetwork.IsConnected)
+                {
+                    return;
+                }    
             }
 
             RaycastHit hit;
@@ -181,7 +186,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private void MoveChecker(GameObject go)
     {
-        this.gameObject.transform.position = new Vector3(go.transform.position.x, 0.26f, go.transform.position.z);
+        this.gameObject.transform.position = new Vector3(go.transform.position.x, 1.5f, go.transform.position.z);
     }
 
     private class JumpPositions {
