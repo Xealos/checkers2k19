@@ -2069,7 +2069,7 @@ PrefabInstance:
         type: 3}
       propertyPath: blackCheckerPrefab
       value: 
-      objectReference: {fileID: 1562297157980949021, guid: 39a5b0d2f4ea85f4c89c7f34fc342b83,
+      objectReference: {fileID: 8966604289600462434, guid: 5381341ebf02bc14dba70fa0bb33b52f,
         type: 3}
     - target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
         type: 3}
