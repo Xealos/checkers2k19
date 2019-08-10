@@ -162,9 +162,7 @@ public class MainLobby : MonoBehaviourPunCallbacks
     
     public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        // We keep random rooms hidden so that their randomly generated names don't junk up the Join room list. 
-        // Join room list is intended to display 'public' rooms that people create. 
-        PhotonNetwork.CreateRoom(null, new RoomOptions{ MaxPlayers = _maxPlayersPerRoom, IsVisible = false });
+        PhotonNetwork.CreateRoom(null, new RoomOptions{ MaxPlayers = _maxPlayersPerRoom });
     }
     
     public override void OnDisconnected(DisconnectCause cause)
