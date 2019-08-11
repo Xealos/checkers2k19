@@ -186,7 +186,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private void MoveChecker(GameObject go)
     {
-        this.gameObject.transform.position = new Vector3(go.transform.position.x, 1.5f, go.transform.position.z);
+        this.gameObject.transform.position = new Vector3(go.transform.position.x, 0.25f, go.transform.position.z);
     }
 
     private class JumpPositions {

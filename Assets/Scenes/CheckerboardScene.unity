@@ -672,7 +672,7 @@ RectTransform:
   - {fileID: 883183645}
   - {fileID: 341370606}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1795,7 +1795,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &932977950
 GameObject:
@@ -2087,6 +2087,23 @@ PrefabInstance:
       propertyPath: myTurn
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
+        type: 3}
+      propertyPath: checkersConatiner
+      value: 
+      objectReference: {fileID: 1452847520}
+    - target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
+        type: 3}
+      propertyPath: blackKingCheckerPrefab
+      value: 
+      objectReference: {fileID: 8966604289600462434, guid: 5381341ebf02bc14dba70fa0bb33b52f,
+        type: 3}
+    - target: {fileID: 3952480815889252785, guid: 455c4d7b6da52634699744165a02e403,
+        type: 3}
+      propertyPath: whiteKingCheckerPrefab
+      value: 
+      objectReference: {fileID: 4321346364021684068, guid: 2a82301f165aade41b95a8be1e9b7ce0,
+        type: 3}
     - target: {fileID: 8181271757210950947, guid: 455c4d7b6da52634699744165a02e403,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2125,7 +2142,7 @@ PrefabInstance:
     - target: {fileID: 8181271757210950947, guid: 455c4d7b6da52634699744165a02e403,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8181271757210950947, guid: 455c4d7b6da52634699744165a02e403,
         type: 3}
@@ -2476,6 +2493,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1109342852123754, guid: e187b316755304b8396d3c14fa53dde7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4696857459274204, guid: e187b316755304b8396d3c14fa53dde7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 2.0860615
@@ -2514,6 +2535,36 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e187b316755304b8396d3c14fa53dde7, type: 3}
+--- !u!1 &1452847520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1452847521}
+  m_Layer: 0
+  m_Name: Checkers
+  m_TagString: Checkers
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1452847521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452847520}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2077681430}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1460252189
 GameObject:
   m_ObjectHideFlags: 0
@@ -3133,7 +3184,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1957540534
 MonoBehaviour:
