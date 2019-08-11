@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -174,7 +175,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
                 _gameState = GameState.WaitingForPlayer;
                 break;
             case GameState.PlayerWin:
-                GameOver();
+                GameOver(true);
+                break;
+            case GameState.OpponentWin:
+                GameOver(false);
                 break;
         }
     }
@@ -354,10 +358,26 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
         PhotonNetwork.LoadLevel("CheckerboardScene");
     }
-    
-    private void GameOver()
+
+    private void CheckForGameOver()
     {
-        
+        int player1PieceCount = BoardState.Values.Count(k => k==CellState.Player1);
+        int player2PieceCount = BoardState.Values.Count(k => k == CellState.Player2);
+
+        // Check to see if either player is out of pieces, then update the game over state based on which player
+        // they are. 
+        if (player1PieceCount == 0)
+        {
+            _gameState = player1 ? GameState.OpponentWin : GameState.PlayerWin;
+        }
+        else if (player2PieceCount == 0)
+        {
+            _gameState = player1 ? GameState.PlayerWin : GameState.OpponentWin;
+        }
+    }
+    
+    private void GameOver(bool playerWin)
+    {
     }
 
     #region Photon Callbacks
@@ -415,6 +435,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             
             MyTurn = true;
         }
+        
+        //Check to see if we've met the criteria for a Game Over
+        CheckForGameOver();
     }
     
     public void OnTurnCompleted(int turn)
