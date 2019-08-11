@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     
     public bool player1;
 
+    private CheckerColor _checkerColor;
+
     public static bool MyTurn;
 
     private static PunTurnManager _turnManager;
@@ -101,6 +103,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         OpponentForfeit
     }
 
+    private enum CheckerColor
+    {
+        Black,
+        White
+    }
+
     void Start()
     {
         _turnManager = gameObject.AddComponent<PunTurnManager>();
@@ -119,18 +127,22 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             {
                 name = "GameManager Player 1";
                 
+                // TODO Brandon: Maybe let the player creating the room pick the color they want. 
+                _checkerColor = CheckerColor.Black;
+                
                 // We'll need to wait for another player to enter before continuing. 
                 _gameState = GameState.WaitingForPlayer;
             }
             else
             {
                 name = "Game Manager PLayer 2";
+                _checkerColor = CheckerColor.White;
                 
                 // We know another player is here, so let's start allowing play. 
                 _gameState = GameState.PlayingGame;
             }
 
-            SetupCheckers(player1);
+            SetupCheckers();
 
             SetupCamera(player1);
 
@@ -187,14 +199,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         }
     }
     
-    private void SetupCheckers(bool player1)
+    private void SetupCheckers()
     {
-        GameObject checker = null;
         Dictionary<string, Vector3> test;
         string prefabName;
 
-        // TODO Brandon: Maybe let the player creating the room pick the color they want. 
-        if (player1)
+        if (_checkerColor == CheckerColor.Black)
         {
             test = BlackSpawnPoints;
             prefabName = blackCheckerPrefab.name;
@@ -209,8 +219,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         // Create the whole set of checkers.
         foreach (KeyValuePair<string, Vector3> coords in test)
         {
-            checker = PhotonNetwork.Instantiate(prefabName, coords.Value,
+            var checker = PhotonNetwork.Instantiate(prefabName, coords.Value,
                 Quaternion.Euler(-90, 0, 0));
+            
+            // TODO Brandon: Can't assign the checkers to this parent as it gets reset when the 2nd player enters the
+            // TODO          match. Come up with a way to address this. 
+            //checker.transform.parent = checkersConatiner.transform;
 
             checker.name = prefabName + " " + coords.Key;
             
