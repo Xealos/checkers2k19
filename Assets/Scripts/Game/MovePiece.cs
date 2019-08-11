@@ -98,8 +98,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
                             // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
                             // TODO          to make the data structure private and have an accessor function in 
                             // TODO          the game manager. 
-                            GameManager.BoardState[hit.transform.gameObject.name] = true;
-                            GameManager.BoardState[this.gameObject.tag] = false;
+                            _gameManager.OccupySpace(hit.transform.gameObject.name);
+                            GameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
@@ -124,7 +124,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
         List<JumpPositions> validJumps;
 
         // Path 1 - Invalid - Adjacent space (forward) with a piece on it.
-        if (GameManager.BoardState[name])
+        if (_gameManager.IsOccupied(name))
         {
             return false;
         }
@@ -168,10 +168,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
                     jumpOverSpace = jumps.getJumps()[name];
                     // Then the associated value must be occupied by an opposing piece.
-
-                    // TODO TIM: For now, as long as any piece is occupying the square, the jump is valid.
-                    // This must be changed to check for opposing pieces.
-                    if (GameManager.BoardState[jumpOverSpace])
+                    
+                    if (_gameManager.IsOccupiedByOpponent(jumpOverSpace))
                     {
                         // TODO TIM: Destroy piece that was jumped over
                         // PhotonNetwork.Destroy()

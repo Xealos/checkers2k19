@@ -60,41 +60,48 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
     
-    public static Dictionary<string, bool> BoardState = new Dictionary<string, bool>
+    public static Dictionary<string, CellState> BoardState = new Dictionary<string, CellState>
     {
-        {"A1", true},
-        {"A3", true},
-        {"A5", true},
-        {"A7", true},
-        {"B2", true},
-        {"B4", true},
-        {"B6", true},
-        {"B8", true},
-        {"C1", true},
-        {"C3", true},
-        {"C5", true},
-        {"C7", true},
-        {"D2", false},
-        {"D4", false},
-        {"D6", false},
-        {"D8", false},
-        {"E1", false},
-        {"E3", false},
-        {"E5", false},
-        {"E7", false},
-        {"F2", true},
-        {"F4", true},
-        {"F6", true},
-        {"F8", true},
-        {"G1", true},
-        {"G3", true},
-        {"G5", true},
-        {"G7", true},
-        {"H2", true},
-        {"H4", true},
-        {"H6", true},
-        {"H8", true}
+        {"A1", CellState.Player1},
+        {"A3", CellState.Player1},
+        {"A5", CellState.Player1},
+        {"A7", CellState.Player1},
+        {"B2", CellState.Player1},
+        {"B4", CellState.Player1},
+        {"B6", CellState.Player1},
+        {"B8", CellState.Player1},
+        {"C1", CellState.Player1},
+        {"C3", CellState.Player1},
+        {"C5", CellState.Player1},
+        {"C7", CellState.Player1},
+        {"D2", CellState.Empty},
+        {"D4", CellState.Empty},
+        {"D6", CellState.Empty},
+        {"D8", CellState.Empty},
+        {"E1", CellState.Empty},
+        {"E3", CellState.Empty},
+        {"E5", CellState.Empty},
+        {"E7", CellState.Empty},
+        {"F2", CellState.Player2},
+        {"F4", CellState.Player2},
+        {"F6", CellState.Player2},
+        {"F8", CellState.Player2},
+        {"G1", CellState.Player2},
+        {"G3", CellState.Player2},
+        {"G5", CellState.Player2},
+        {"G7", CellState.Player2},
+        {"H2", CellState.Player2},
+        {"H4", CellState.Player2},
+        {"H6", CellState.Player2},
+        {"H8", CellState.Player2}
     };
+
+    public enum CellState
+    {
+        Empty,
+        Player1,
+        Player2
+    }
     
     private enum GameState
     {
@@ -232,9 +239,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             // TODO TIM: Is the tag needed for validation?
             checker.tag = coords.Key;
 
-            // Update the board state. The space is occupied.
-            BoardState[coords.Key] = true;
-
             //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
             //scene reloads.
             DontDestroyOnLoad(checker);
@@ -306,6 +310,35 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         DontDestroyOnLoad(king);
     
     }
+
+    public void OccupySpace(string cell)
+    {
+        if (player1)
+        {
+            BoardState[cell] = CellState.Player1;
+        }
+        else
+        {
+            BoardState[cell] = CellState.Player2;
+        }
+    }
+
+    public bool IsOccupied(string cell)
+    {
+        return BoardState[cell] == CellState.Player1 || BoardState[cell] == CellState.Player2;
+    }
+
+    public bool IsOccupiedByOpponent(string cell)
+    {
+        if (player1)
+        {
+            return BoardState[cell] == CellState.Player2;
+        }
+        else
+        {
+            return BoardState[cell] == CellState.Player1;
+        }
+    }
     
     public void LeaveRoom()
     {
@@ -371,7 +404,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         else
         {
             // Sync the board state after the opponent finishes their movements.
-            BoardState = (Dictionary<string, bool>) move;
+            var simpleCast = (Dictionary<string, int>) move;
+            
+            // For some reason, a direct cast to <string, CellState> does not work, so instead we iterate and cast 
+            // each value. 
+            foreach (KeyValuePair<string, int> state in simpleCast)
+            {
+                BoardState[state.Key] = (CellState)state.Value;
+            }
+            
             MyTurn = true;
         }
     }
@@ -393,7 +434,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         // the opponent's intermediate message. 
         if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
         {
-            BoardState = (Dictionary<string, bool>) move;
+            BoardState = (Dictionary<string, CellState>) move;
         }
 
     }
