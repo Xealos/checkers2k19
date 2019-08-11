@@ -9,8 +9,10 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 {
     public GameObject blackCheckerPrefab;
-
+    public GameObject blackKingCheckerPrefab;
     public GameObject whiteCheckerPrefab;
+    public GameObject whiteKingCheckerPrefab;
+    public GameObject checkersConatiner;
 
     public Camera playerCamera;
     
@@ -176,7 +178,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         
         if (player1)
         {
-            
             camTransform.position = new Vector3(0.303f, 3.185f, 4.822f);
             camTransform.rotation = Quaternion.Euler(45, -180, 0);
         }
@@ -260,6 +261,50 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             // If the move is valid, send the updated board state and indicate the player has finished their turn. 
             _turnManager.SendMove(BoardState, true);
         }
+    }
+
+    public void KingMe(string checkerTag)
+    {
+        GameObject checkerGo = GameObject.FindWithTag(checkerTag);
+
+        if (checkerGo == null)
+        {
+            return;
+        }
+        
+        // Make sure this checker isn't already a king. 
+        if (checkerGo.GetComponent<MovePiece>().isKing)
+        {
+            return;
+        }
+
+        PhotonNetwork.Destroy(checkerGo);
+        Vector3 coords;
+        string prefabName;
+        
+        if (_checkerColor == CheckerColor.Black)
+        {
+            coords = BlackSpawnPoints[checkerTag];
+            prefabName = blackKingCheckerPrefab.name;
+        }
+        else
+        {
+            coords = WhiteSpawnPoints[checkerTag];
+            prefabName = whiteKingCheckerPrefab.name;
+        }
+
+        coords.y = 1.5f;  //We need to set the king checker down from a greater height because it's taller. 
+        
+        GameObject king = PhotonNetwork.Instantiate(prefabName, coords,
+            Quaternion.Euler(-90, 0, 0));
+        
+        king.transform.parent = checkersConatiner.transform;
+
+        king.name = prefabName + " " + checkerTag; 
+        king.tag = checkerTag;
+        
+        DontDestroyOnLoad(king);
+    
     }
     
     public void LeaveRoom()
