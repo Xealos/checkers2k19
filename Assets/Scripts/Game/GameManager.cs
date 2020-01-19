@@ -343,6 +343,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             return BoardState[cell] == CellState.Player1;
         }
     }
+
+    public bool IsOccupiedByPlayer(string cell)
+    {
+        if (player1)
+        {
+            return BoardState[cell] == CellState.Player1;
+        }
+        else
+        {
+            return BoardState[cell] == CellState.Player2;
+        }
+    }
     
     public void LeaveRoom()
     {
@@ -453,6 +465,27 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 
     public void OnPlayerMove(Player player, int turn, object move)
     {
+
+        if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
+        {
+            // Sync the board state after the opponent finishes their movements.
+            var simpleCast = (Dictionary<string, int>) move;
+            
+            // For some reason, a direct cast to <string, CellState> does not work, so instead we iterate and cast 
+            // each value. 
+            foreach (KeyValuePair<string, int> state in simpleCast)
+            {    
+                // If our new board state indicates that a space was previously occupied by one of our pieces
+                // is no longer there, remove our piece from the board. 
+                if (IsOccupiedByPlayer(state.Key) && (CellState) state.Value == CellState.Empty)
+                {
+                    PhotonNetwork.Destroy(GameObject.FindWithTag(state.Key));
+                }
+                
+                BoardState[state.Key] = (CellState)state.Value;
+            }
+        }
+
         // If the opponent makes a move but hasn't ended their turn, sync the board state based on
         // the opponent's intermediate message. 
         if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
