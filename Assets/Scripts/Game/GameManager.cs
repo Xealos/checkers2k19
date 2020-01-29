@@ -4,6 +4,7 @@ using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -17,7 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 
     public Camera playerCamera;
     
-    public bool player1;
+    public static bool player1;
 
     private CheckerColor _checkerColor;
 
@@ -266,7 +267,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             //TODO Brandon: Maybe the setting of the boardState can go here (pass the key and value as args to this
             //TODO          function instead of setting it directly in the MovePiece class. 
 
-            // If the move is valid, send the updated board state and indicate the player has finished their turn. 
+            // If the move is valid, send the updated board state and indicate the player has finished their turn.
+            _turnManager.SendMove(BoardState, false);
             _turnManager.SendMove(BoardState, true);
         }
     }
@@ -442,7 +444,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             // each value. 
             foreach (KeyValuePair<string, int> state in simpleCast)
             {
-                BoardState[state.Key] = (CellState)state.Value;
+                BoardState[state.Key] = (CellState) state.Value;
             }
             
             MyTurn = true;
@@ -466,6 +468,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public void OnPlayerMove(Player player, int turn, object move)
     {
 
+        string checkerName;
+
         if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
         {
             // Sync the board state after the opponent finishes their movements.
@@ -477,9 +481,24 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             {    
                 // If our new board state indicates that a space was previously occupied by one of our pieces
                 // is no longer there, remove our piece from the board. 
+                if (state.Key == "D2")
+                {
+                    print("Hello");
+                }
+
                 if (IsOccupiedByPlayer(state.Key) && (CellState) state.Value == CellState.Empty)
                 {
-                    PhotonNetwork.Destroy(GameObject.FindWithTag(state.Key));
+                    //PhotonNetwork.Destroy(GameObject.FindWithTag(state.Key));
+                    if (_checkerColor == CheckerColor.Black)
+                    {
+                        checkerName = "B Checker " + state.Key;
+                    }
+                    else
+                    {
+                        checkerName = "W Checker " + state.Key;
+                    }
+                    
+                    PhotonNetwork.Destroy(GameObject.Find(checkerName));
                 }
                 
                 BoardState[state.Key] = (CellState)state.Value;
@@ -498,6 +517,18 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public void OnTurnTimeEnds(int turn)
     {
         // Intentionally left blank
+    }
+
+    public string GetCheckerStr()
+    {
+        if (_checkerColor == CheckerColor.Black)
+        {
+            return "B Checker ";
+        }
+        else
+        {
+            return "W Checker ";
+        }
     }
 
     #endregion

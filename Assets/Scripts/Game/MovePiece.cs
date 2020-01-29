@@ -103,6 +103,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
+                            this.gameObject.name = _gameManager.GetCheckerStr() + hit.transform.gameObject.name;
 
                             // Tell the game manager to update the game state
                             _gameManager.UpdateGameState();
@@ -135,7 +136,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
             validMovements = validKingMovements;
             validJumps = validKingJumps;
         }
-        else if (_gameManager.player1)
+        else if (GameManager.player1)
         {
             validMovements = validBlackMovements_Regular;
             validJumps = validBlackJumps;
@@ -171,8 +172,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     
                     if (_gameManager.IsOccupiedByOpponent(jumpOverSpace))
                     {
-                        // TODO TIM: Destroy piece that was jumped over
-                        // PhotonNetwork.Destroy()
+                        GameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
                         return true;
                     }
                 }
