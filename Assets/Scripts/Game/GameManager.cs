@@ -14,20 +14,17 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public GameObject whiteCheckerPrefab;
     public GameObject whiteKingCheckerPrefab;
     public GameObject checkersConatiner;
-
+    public InterfaceManager interfaceManager;
     public Camera playerCamera;
-    
     public static bool player1;
 
     private CheckerColor _checkerColor;
-
     public static bool MyTurn;
-
     private static PunTurnManager _turnManager;
-
     private static bool _instantiated;
-
     private static GameState _gameState;
+    private static GameState _gameStatePrev;
+
 
     private static readonly Dictionary<string, Vector3> BlackSpawnPoints = new Dictionary<string, Vector3>
     {
@@ -164,23 +161,25 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 
     void Update()
     {
-        switch (_gameState)
+        if( _gameState != _gameStatePrev)
         {
-            case GameState.WaitingForPlayer when PhotonNetwork.CurrentRoom.PlayerCount == 2:
-                _gameState = GameState.PlayingGame;
-                break;
-            case GameState.OpponentForfeit:
-                //Wait for another player to enter the room 
-                //TODO Brandon: Do we want to wait for another player or just end the game? 
-                _gameState = GameState.WaitingForPlayer;
-                break;
-            case GameState.PlayerWin:
-                GameOver(true);
-                break;
-            case GameState.OpponentWin:
-                GameOver(false);
-                break;
+            switch (_gameState)
+            {
+                case GameState.OpponentForfeit:
+                    interfaceManager.SetOpponentForfeitPanel();
+                    _gameState = GameState.WaitingForPlayer;
+                    break;
+                case GameState.PlayerWin:
+                    interfaceManager.SetGameOverPanel(true);
+                    break;
+                case GameState.OpponentWin:
+                    interfaceManager.SetGameOverPanel(false);
+                    break;
+            }
+
+            _gameStatePrev = _gameState;
         }
+        
     }
     
     private void SetupCamera(bool player1)
@@ -405,6 +404,11 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         // not seen if you're the player connecting
         Debug.LogFormat("{0} has entered the match!", other.NickName);
 
+        if(PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        {
+            _gameState = GameState.PlayingGame;
+        }
+
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
@@ -479,12 +483,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             foreach (KeyValuePair<string, int> state in simpleCast)
             {    
                 // If our new board state indicates that a space was previously occupied by one of our pieces
-                // is no longer there, remove our piece from the board. 
-                if (state.Key == "D2")
-                {
-                    print("Hello");
-                }
-
+                // is no longer there, remove our piece from the board.
                 if (IsOccupiedByPlayer(state.Key) && (CellState) state.Value == CellState.Empty)
                 {
                     //PhotonNetwork.Destroy(GameObject.FindWithTag(state.Key));

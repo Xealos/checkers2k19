@@ -11,6 +11,9 @@ public class InterfaceManager : MonoBehaviour
     public Text playerName;
     public Text opponentName;
     public Text playerTurn;
+    public GameObject results; 
+
+    public GameObject gameResult; 
 
     private static bool _instantiated;
     
@@ -19,12 +22,6 @@ public class InterfaceManager : MonoBehaviour
     // Start is called before the first frame update
     public void Start()
     {
-//        if (_instantiated == false)
-//        {
-//            _turnListener = GameObject.FindWithTag("GameManager").GetComponent<GameManager>().turnListeners;
-//            _instantiated = true;
-//        }
-
         playerName.text = PhotonNetwork.NickName;
     }
 
@@ -32,16 +29,6 @@ public class InterfaceManager : MonoBehaviour
     public void Update()
     {
         //TODO Brandon: These update calls seem inefficient. Is there a better way to do this?
-        if (_instantiated == false)
-        {
-            if (_turnListener == null)
-            {
-                _turnListener = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
-                _instantiated = true;
-            }
-
-        }
-
         // Someone else has entered the room
         if(PhotonNetwork.PlayerList.Count() > 1)
         {
@@ -60,8 +47,33 @@ public class InterfaceManager : MonoBehaviour
         {
             playerTurn.text = PhotonNetwork.PlayerListOthers[0].NickName + "'s Turn";
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // TODO Brandon: Add menu panel enablement here. 
+        }
         
     }
 
+    public void SetGameOverPanel(bool isWinner)
+    {
+        if(isWinner)
+        {
+            results.GetComponent<TextMeshProUGUI>().text = "You Win!";
+        }
+        else
+        {
+            results.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+        }
 
+        gameResult.SetActive(true);
+    }
+
+    public void SetOpponentForfeitPanel()
+    {
+        // Widen the transform to account for longer text
+        results.GetComponent<RectTransform>().sizeDelta = new Vector2(425, 50);
+        results.GetComponent<TextMeshProUGUI>().text = "Opponent Forfeit!";
+        gameResult.SetActive(true);
+    }
 }
