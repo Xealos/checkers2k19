@@ -4,7 +4,6 @@ using Photon.Realtime;
 using Photon.Pun.UtilityScripts;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
