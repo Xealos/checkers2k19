@@ -11,6 +11,7 @@ public class InterfaceManager : MonoBehaviour
     public Text playerName;
     public Text opponentName;
     public Text playerTurn;
+    public GameObject waitingText;
     public GameObject results;
     public GameObject gameResult;
     public GameObject escMenu;
@@ -75,10 +76,5 @@ public class InterfaceManager : MonoBehaviour
         results.GetComponent<RectTransform>().sizeDelta = new Vector2(425, 50);
         results.GetComponent<TextMeshProUGUI>().text = "Opponent Forfeit!";
         gameResult.SetActive(true);
-    }
-
-    public void ToggleEscMenu()
-    {
-        
     }
 }

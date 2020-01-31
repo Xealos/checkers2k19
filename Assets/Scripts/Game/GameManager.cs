@@ -139,6 +139,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
                 
                 // We'll need to wait for another player to enter before continuing. 
                 _gameState = GameState.WaitingForPlayer;
+                interfaceManager.waitingText.SetActive(true);
             }
             else
             {
@@ -165,6 +166,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {
             switch (_gameState)
             {
+                case GameState.PlayingGame:
+                    interfaceManager.waitingText.SetActive(false);
+                    break;
                 case GameState.OpponentForfeit:
                     interfaceManager.SetOpponentForfeitPanel();
                     _gameState = GameState.WaitingForPlayer;
@@ -185,7 +189,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     private void SetupCamera(bool player1)
     {
         var camTransform = playerCamera.transform;
-        
+
         if (player1)
         {
             camTransform.position = new Vector3(0.303f, 3.185f, 4.822f);
