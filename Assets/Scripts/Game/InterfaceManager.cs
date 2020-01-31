@@ -11,12 +11,11 @@ public class InterfaceManager : MonoBehaviour
     public Text playerName;
     public Text opponentName;
     public Text playerTurn;
-    public GameObject results; 
-
-    public GameObject gameResult; 
+    public GameObject results;
+    public GameObject gameResult;
+    public GameObject escMenu;
 
     private static bool _instantiated;
-    
     private static GameManager _turnListener;
     
     // Start is called before the first frame update
@@ -50,7 +49,8 @@ public class InterfaceManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            // TODO Brandon: Add menu panel enablement here. 
+            // Toggle menu with escape key.
+            escMenu.SetActive(!escMenu.activeSelf);
         }
         
     }
@@ -75,5 +75,10 @@ public class InterfaceManager : MonoBehaviour
         results.GetComponent<RectTransform>().sizeDelta = new Vector2(425, 50);
         results.GetComponent<TextMeshProUGUI>().text = "Opponent Forfeit!";
         gameResult.SetActive(true);
+    }
+
+    public void ToggleEscMenu()
+    {
+        
     }
 }
