@@ -132,8 +132,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             
             if (player1)
             {
-                name = "GameManager Player 1";
-                
                 // TODO Brandon: Maybe let the player creating the room pick the color they want. 
                 _checkerColor = CheckerColor.Black;
                 
@@ -143,7 +141,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             }
             else
             {
-                name = "Game Manager PLayer 2";
                 _checkerColor = CheckerColor.White;
                 
                 // We know another player is here, so let's start allowing play. 
@@ -158,6 +155,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             
             _instantiated = true;
         }
+        
+        if (PhotonNetwork.CurrentRoom.PlayerCount > 1)
+        {
+            interfaceManager.SetPlayGameText(MyTurn);
+        }
+        
     }
 
     void Update()
@@ -167,7 +170,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             switch (_gameState)
             {
                 case GameState.PlayingGame:
-                    interfaceManager.waitingText.SetActive(false);
+                    interfaceManager.SetPlayGameText(MyTurn);
                     break;
                 case GameState.OpponentForfeit:
                     interfaceManager.SetOpponentForfeitPanel();
@@ -270,6 +273,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             //TODO          function instead of setting it directly in the MovePiece class. 
 
             // If the move is valid, send the updated board state and indicate the player has finished their turn.
+            // TODO Brandon: This won't work for double jumps. 
             _turnManager.SendMove(BoardState, false);
             _turnManager.SendMove(BoardState, true);
         }
@@ -391,10 +395,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             _gameState = player1 ? GameState.PlayerWin : GameState.OpponentWin;
         }
     }
-    
-    private void GameOver(bool playerWin)
-    {
-    }
 
     #region Photon Callbacks
     public override void OnLeftRoom()
@@ -457,8 +457,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             MyTurn = true;
         }
         
-        //Check to see if we've met the criteria for a Game Over
         CheckForGameOver();
+        
+        interfaceManager.SetPlayerTurnText(MyTurn);
     }
     
     public void OnTurnCompleted(int turn)

@@ -18,42 +18,36 @@ public class InterfaceManager : MonoBehaviour
 
     private static bool _instantiated;
     private static GameManager _turnListener;
-    
-    // Start is called before the first frame update
-    public void Start()
-    {
-        playerName.text = PhotonNetwork.NickName;
-    }
 
     // Update is called once per frame
     public void Update()
     {
-        //TODO Brandon: These update calls seem inefficient. Is there a better way to do this?
-        // Someone else has entered the room
-        if(PhotonNetwork.PlayerList.Count() > 1)
-        {
-            // Assume we only have two players
-            Player[] players = PhotonNetwork.PlayerListOthers;
-
-            opponentName.text = players[0].NickName;
-        }
-
-        // Check to see whose turn it is and update the UI accordingly
-        if (GameManager.MyTurn)
-        {
-            playerTurn.text = PhotonNetwork.NickName + "'s Turn";
-        }
-        else
-        {
-            playerTurn.text = PhotonNetwork.PlayerListOthers[0].NickName + "'s Turn";
-        }
-
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             // Toggle menu with escape key.
             escMenu.SetActive(!escMenu.activeSelf);
         }
         
+    }
+
+    public void SetPlayGameText(bool myTurn)
+    {
+        waitingText.SetActive(false);
+        playerName.text = PhotonNetwork.NickName;
+        opponentName.text = PhotonNetwork.PlayerListOthers[0].NickName;
+        SetPlayerTurnText(myTurn);
+    }
+
+    public void SetPlayerTurnText(bool myTurn)
+    {
+        if (myTurn)
+        {
+            playerTurn.text = playerName.text + "'s Turn";
+        }
+        else
+        {
+            playerTurn.text = opponentName.text + "'s Turn";
+        }
     }
 
     public void SetGameOverPanel(bool isWinner)
