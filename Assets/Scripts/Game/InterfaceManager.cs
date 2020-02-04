@@ -8,8 +8,10 @@ using TMPro;
 
 public class InterfaceManager : MonoBehaviour
 {
-    public Text playerName;
-    public Text opponentName;
+    public TextMeshProUGUI playerName;
+    public TextMeshProUGUI opponentName;
+    public GameObject redGlowShader;
+    public GameObject versus;
     public Text playerTurn;
     public GameObject waitingText;
     public GameObject results;
@@ -35,6 +37,7 @@ public class InterfaceManager : MonoBehaviour
         waitingText.SetActive(false);
         playerName.text = PhotonNetwork.NickName;
         opponentName.text = PhotonNetwork.PlayerListOthers[0].NickName;
+        versus.SetActive(true);
         SetPlayerTurnText(myTurn);
     }
 
