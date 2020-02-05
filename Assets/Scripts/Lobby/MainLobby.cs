@@ -157,7 +157,7 @@ public class MainLobby : MonoBehaviourPunCallbacks
         _isConnectedToRoom = true;
         
         Debug.Log("Loading Checkerboard Scene...");
-        PhotonNetwork.LoadLevel("CheckerboardScene");
+        PhotonNetwork.LoadLevel("Checkerboard Scene");
     }
     
     public override void OnJoinRandomFailed(short returnCode, string message)

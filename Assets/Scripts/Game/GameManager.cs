@@ -376,7 +376,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             Debug.LogError("PhotonNetwork : Trying to load a level be we are not the master client.");
         }
         Debug.LogFormat("PhotonNetwork : Loading Level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
-        PhotonNetwork.LoadLevel("CheckerboardScene");
+        PhotonNetwork.LoadLevel("Checkerboard Scene");
     }
 
     private void CheckForGameOver()
