@@ -512,7 +512,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         // the opponent's intermediate message. 
         if (player.UserId != PhotonNetwork.LocalPlayer.UserId)
         {
-            BoardState = (Dictionary<string, CellState>) move;
+            // Sync the board state after the opponent finishes their movements.
+            var simpleCast = (Dictionary<string, int>) move;
+            
+            // For some reason, a direct cast to <string, CellState> does not work, so instead we iterate and cast 
+            // each value. 
+            foreach (KeyValuePair<string, int> state in simpleCast)
+            {
+                BoardState[state.Key] = (CellState) state.Value;
+            }
         }
 
     }

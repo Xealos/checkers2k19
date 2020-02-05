@@ -6,9 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Menu System.unity
+    path: Assets/Scenes/Title Screen.unity
     guid: e7a323acb61b88f459df2af2b961f84d
   - enabled: 1
-    path: Assets/Scenes/CheckerboardScene.unity
+    path: Assets/Scenes/Checkerboard Scene.unity
     guid: 4b5b57cfbfecae149be82b3ed57865ec
   m_configObjects: {}
