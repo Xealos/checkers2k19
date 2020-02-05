@@ -105,6 +105,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
                             this.gameObject.tag = hit.transform.gameObject.name;
                             this.gameObject.name = _gameManager.GetCheckerStr() + hit.transform.gameObject.name;
 
+                            // If the checker is at the opposite end of the board, check to see if it can be made a king.
+                            if (checkForKingability(GameManager.player1,this.gameObject.tag))
+                            {
+                                _gameManager.KingMe(this.gameObject.tag);
+                            }
+
                             // Tell the game manager to update the game state
                             _gameManager.UpdateGameState();
                         }
@@ -116,6 +122,21 @@ public class MovePiece : MonoBehaviourPunCallbacks
                 }
             }
         }
+    }
+
+    private bool checkForKingability(bool isPlayer1, string space)
+    {
+        // Player 1 is checking for row H
+        if (isPlayer1)
+        {
+            if (space.Contains("H")) return true;
+        }
+        // Player 2 is checking for row A
+        else
+        {
+            if (space.Contains("A")) return true;
+        }
+        return false;
     }
 
     // Pass in the name of the space.

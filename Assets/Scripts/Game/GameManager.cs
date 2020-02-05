@@ -300,12 +300,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         
         if (_checkerColor == CheckerColor.Black)
         {
-            coords = BlackSpawnPoints[checkerTag];
+            coords = WhiteSpawnPoints[checkerTag];
             prefabName = blackKingCheckerPrefab.name;
         }
         else
         {
-            coords = WhiteSpawnPoints[checkerTag];
+            coords = BlackSpawnPoints[checkerTag];
             prefabName = whiteKingCheckerPrefab.name;
         }
 
