@@ -28,6 +28,7 @@ public class InterfaceManager : MonoBehaviour
         {
             // Toggle menu with escape key.
             escMenu.SetActive(!escMenu.activeSelf);
+            waitingText.SetActive(!waitingText.activeSelf);
         }
         
     }
