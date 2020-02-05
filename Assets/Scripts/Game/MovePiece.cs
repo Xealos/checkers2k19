@@ -86,7 +86,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
                 if (hit.transform != null) {
 
-                    if (hit.transform.gameObject.name == this.gameObject.name)
+                    if ((hit.transform.gameObject.name == this.gameObject.name && !isKing) 
+                        || isKing && this.gameObject.transform.FindChild(hit.transform.gameObject.name) != null)
                     {
                         selected = true;
                     }
