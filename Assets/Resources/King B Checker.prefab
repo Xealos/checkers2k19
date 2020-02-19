@@ -43,7 +43,6 @@ GameObject:
   - component: {fileID: 8966604289600462447}
   - component: {fileID: 8966604289600462444}
   - component: {fileID: 4260670170851374016}
-  - component: {fileID: 2659574696635827868}
   m_Layer: 0
   m_Name: King B Checker
   m_TagString: Untagged
@@ -137,22 +136,6 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 90
   m_CollisionDetection: 1
---- !u!114 &2659574696635827868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8966604289600462434}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40965ca584ba8744f9b6a065b48d874c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPhotonView: {fileID: 0}
-  selected: 0
-  isKing: 0
-  debugLocal: 0
 --- !u!1001 &8966604289059700020
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -314,7 +314,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         GameObject king = PhotonNetwork.Instantiate(prefabName, coords,
             Quaternion.Euler(-90, 0, 0));
         
-        king.transform.parent = checkersConatiner.transform;
+        // king.transform.parent = checkersConatiner.transform;
 
         king.name = prefabName + " " + checkerTag; 
         king.tag = checkerTag;

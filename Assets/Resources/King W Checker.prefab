@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4321346364021684065}
   - component: {fileID: 4321346364021684066}
   - component: {fileID: 4321346364021684067}
-  - component: {fileID: -1901810258691975130}
   m_Layer: 0
   m_Name: King W Checker
   m_TagString: Untagged
@@ -31,8 +30,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 7637947803408378318}
-  - {fileID: 7637947803031597587}
+  - {fileID: 4321346364199081751}
+  - {fileID: 4321346362396298442}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
@@ -89,22 +88,6 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
---- !u!114 &-1901810258691975130
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4321346364021684068}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40965ca584ba8744f9b6a065b48d874c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPhotonView: {fileID: 0}
-  selected: 0
-  isKing: 0
-  debugLocal: 0
 --- !u!1001 &4321346362396298528
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -185,7 +168,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: -2720686709573781199, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
---- !u!4 &7637947803031597587 stripped
+--- !u!4 &4321346362396298442 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5910957537995439923, guid: 42f469271c7cd0746a5df66a0078e4dd,
     type: 3}
@@ -273,7 +256,7 @@ PrefabInstance:
     - {fileID: 1430605833582778942, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
     - {fileID: 8492123628440828609, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
---- !u!4 &7637947803408378318 stripped
+--- !u!4 &4321346364199081751 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5910957537995439923, guid: 42f469271c7cd0746a5df66a0078e4dd,
     type: 3}
