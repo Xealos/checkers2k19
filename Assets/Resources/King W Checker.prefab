@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4321346364021684065}
   - component: {fileID: 4321346364021684066}
   - component: {fileID: 4321346364021684067}
+  - component: {fileID: 2456680867683065748}
   m_Layer: 0
   m_Name: King W Checker
   m_TagString: Untagged
@@ -88,6 +89,22 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+--- !u!54 &2456680867683065748
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4321346364021684068}
+  serializedVersion: 2
+  m_Mass: 10
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 2
+  m_Constraints: 90
+  m_CollisionDetection: 1
 --- !u!1001 &4321346362396298528
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -167,6 +184,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: -2720686709573781199, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
+    - {fileID: 5968466132924758571, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
 --- !u!4 &4321346362396298442 stripped
 Transform:
@@ -255,6 +273,7 @@ PrefabInstance:
     - {fileID: -2720686709573781199, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
     - {fileID: 1430605833582778942, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
     - {fileID: 8492123628440828609, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
+    - {fileID: 5968466132924758571, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
 --- !u!4 &4321346364199081751 stripped
 Transform:
