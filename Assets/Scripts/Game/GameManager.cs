@@ -24,9 +24,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     private static bool _instantiated;
     private static GameState _gameState;
     private static GameState _gameStatePrev;
+    private static Vector2 _cellSize = new Vector2(0.62f, 0.62f);
+    private static Vector2 _checkerBoardOrigin = new Vector2(2.765f, 2.422f);
 
-
-    private static readonly Dictionary<string, Vector3> BlackSpawnPoints = new Dictionary<string, Vector3>
+    private static readonly Dictionary<string, Vector3> ValidSpawnPoints = new Dictionary<string, Vector3>
     {
         { "A1", new Vector3(2.765f, 0.261f, 2.422f)},
         { "A3", new Vector3(1.459f, 0.261f, 2.422f)},
@@ -39,11 +40,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         { "C1", new Vector3(2.765f, 0.261f, 1.136f)},
         { "C3", new Vector3(1.459f, 0.261f, 1.136f)},
         { "C5", new Vector3(0.186f, 0.261f, 1.136f)},
-        { "C7", new Vector3(-1.102f, 0.261f, 1.136f)}
-    };
-
-    private static readonly Dictionary<string, Vector3> WhiteSpawnPoints = new Dictionary<string, Vector3>
-    {
+        { "C7", new Vector3(-1.102f, 0.261f, 1.136f)},
         { "F2", new Vector3(2.102f, 0.261f, -0.78f)},
         { "F4", new Vector3(0.819f, 0.261f, -0.78f)},
         { "F6", new Vector3(-0.457f, 0.261f, -0.78f)},
@@ -57,7 +54,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         { "H6", new Vector3(-0.457f, 0.261f, -2.07f)},
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
-    
+
     public static Dictionary<string, CellState> BoardState = new Dictionary<string, CellState>
     {
         {"A1", CellState.Player1},
@@ -219,35 +216,49 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     
     private void SetupCheckers()
     {
-        Dictionary<string, Vector3> test;
         string prefabName;
+        Vector3 coords = new Vector3();
+        GameObject checker = new GameObject();
 
         if (_checkerColor == CheckerColor.Black)
         {
-            test = BlackSpawnPoints;
             prefabName = blackCheckerPrefab.name;
         }
         else
         {
-
-            test = WhiteSpawnPoints;
             prefabName = whiteCheckerPrefab.name;
         }
 
         // Create the whole set of checkers.
-        foreach (KeyValuePair<string, Vector3> coords in test)
+        foreach (KeyValuePair<string, CellState> state in BoardState)
         {
-            var checker = PhotonNetwork.Instantiate(prefabName, coords.Value,
-                Quaternion.Euler(-90, 0, 0));
+            // TODO Brandon: This can likely be optimized
+            if (player1 == true && state.Value == CellState.Player1)
+            {
+                checker = PhotonNetwork.Instantiate(prefabName, ValidSpawnPoints[state.Key],
+                    Quaternion.Euler(-90, 0, 0));
+            }
+            
+            else if (player1 == false && state.Value == CellState.Player2)
+            {
+                checker = PhotonNetwork.Instantiate(prefabName, ValidSpawnPoints[state.Key], 
+                    Quaternion.Euler(-90, 0, 0));   
+            }
+
+            else
+            {
+                // No checker to spawn on this iteration, keep going.
+                continue;
+            }
             
             // TODO Brandon: Can't assign the checkers to this parent as it gets reset when the 2nd player enters the
             // TODO          match. Come up with a way to address this. 
             //checker.transform.parent = checkersConatiner.transform;
 
-            checker.name = prefabName + " " + coords.Key;
+            checker.name = prefabName + " " + state.Key;
             
             // TODO TIM: Is the tag needed for validation?
-            checker.tag = coords.Key;
+            checker.tag = state.Key;
 
             //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
             //scene reloads.
@@ -297,15 +308,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         PhotonNetwork.Destroy(checkerGo);
         Vector3 coords;
         string prefabName;
+
+        coords = ValidSpawnPoints[checkerTag];
         
         if (_checkerColor == CheckerColor.Black)
         {
-            coords = WhiteSpawnPoints[checkerTag];
             prefabName = blackKingCheckerPrefab.name;
         }
         else
         {
-            coords = BlackSpawnPoints[checkerTag];
             prefabName = whiteKingCheckerPrefab.name;
         }
 
