@@ -130,6 +130,7 @@ MonoBehaviour:
   selected: 0
   isKing: 0
   debugLocal: 0
+  isBlackPiece: 0
 --- !u!114 &8492123628440828609
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -15,6 +15,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     public bool debugLocal;
 
+    public bool isBlackPiece;
+
     private static bool _instantiated;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
@@ -98,8 +100,13 @@ public class MovePiece : MonoBehaviourPunCallbacks
                             // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
                             // TODO          to make the data structure private and have an accessor function in 
                             // TODO          the game manager. 
-                            _gameManager.OccupySpace(hit.transform.gameObject.name);
-                            GameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
+                            var player = GameManager.CellState.Player1;
+                            if (!isBlackPiece)
+                            {
+                                player = GameManager.CellState.Player2;
+                            }
+                            _gameManager.OccupySpace(hit.transform.gameObject.name, player);
+                            _gameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
                             MoveChecker(hit.transform.gameObject);
                             selected = false;
                             this.gameObject.tag = hit.transform.gameObject.name;
@@ -157,7 +164,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
             validMovements = validKingMovements;
             validJumps = validKingJumps;
         }
-        else if (GameManager.player1)
+        else if (isBlackPiece)
         {
             validMovements = validBlackMovements_Regular;
             validJumps = validBlackJumps;
@@ -190,10 +197,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
                     jumpOverSpace = jumps.getJumps()[name];
                     // Then the associated value must be occupied by an opposing piece.
-                    
-                    if (_gameManager.IsOccupiedByOpponent(jumpOverSpace))
+                    bool player1 = isBlackPiece;
+
+                    if (_gameManager.IsOccupiedByOpponent(jumpOverSpace, player1))
                     {
-                        GameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
+                        _gameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
+                        Destroy(GameObject.FindWithTag(jumpOverSpace));
                         return true;
                     }
                 }

@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public InterfaceManager interfaceManager;
     public Camera playerCamera;
     public static bool player1;
+    public bool localPlay;
 
     private CheckerColor _checkerColor;
     public static bool MyTurn;
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         { "H8", new Vector3(-1.759f, 0.261f, -2.07f)}
     };
 
-    public static Dictionary<string, CellState> BoardState = new Dictionary<string, CellState>
+    public Dictionary<string, CellState> BoardState = new Dictionary<string, CellState>
     {
         {"A1", CellState.Player1},
         {"A3", CellState.Player1},
@@ -65,10 +66,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {"B4", CellState.Player1},
         {"B6", CellState.Player1},
         {"B8", CellState.Player1},
-        {"C1", CellState.Player1},
-        {"C3", CellState.Player1},
-        {"C5", CellState.Player1},
-        {"C7", CellState.Player1},
+        {"C1", CellState.Empty},
+        {"C3", CellState.Empty},
+        {"C5", CellState.Empty},
+        {"C7", CellState.Empty},
         {"D2", CellState.Empty},
         {"D4", CellState.Empty},
         {"D6", CellState.Empty},
@@ -77,10 +78,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         {"E3", CellState.Empty},
         {"E5", CellState.Empty},
         {"E7", CellState.Empty},
-        {"F2", CellState.Player2},
-        {"F4", CellState.Player2},
-        {"F6", CellState.Player2},
-        {"F8", CellState.Player2},
+        {"F2", CellState.Empty},
+        {"F4", CellState.Empty},
+        {"F6", CellState.Empty},
+        {"F8", CellState.Empty},
         {"G1", CellState.Player2},
         {"G3", CellState.Player2},
         {"G5", CellState.Player2},
@@ -117,34 +118,57 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     {
         _turnManager = gameObject.AddComponent<PunTurnManager>();
         _turnManager.TurnManagerListener = this;
+        string prefabName; 
         
         // Only execute if we haven't instantiated our checkers yet. This prevents the player 1 entering the room
         // from instantiating another set of objects when player 2 enters. 
         if (_instantiated == false)
         {
             _turnManager.BeginTurn();
-            
-            // If we're the first player to join, set us to player 1. 
-            player1 = PhotonNetwork.CurrentRoom.PlayerCount == 1;
+
+            if (!localPlay)
+            {
+                // If we're the first player to join, set us to player 1. 
+                player1 = PhotonNetwork.CurrentRoom.PlayerCount == 1;   
+            }
+            else
+            {
+                player1 = true;
+            }
             
             if (player1)
             {
                 // TODO Brandon: Maybe let the player creating the room pick the color they want. 
                 _checkerColor = CheckerColor.Black;
-                
-                // We'll need to wait for another player to enter before continuing. 
-                _gameState = GameState.WaitingForPlayer;
-                interfaceManager.waitingText.SetActive(true);
+                prefabName = blackCheckerPrefab.name;
+
+                if (!localPlay)
+                {
+                    // We'll need to wait for another player to enter before continuing. 
+                    _gameState = GameState.WaitingForPlayer;
+                    interfaceManager.waitingText.SetActive(true);   
+                }
+                else
+                {
+                    _gameState = GameState.PlayingGame;
+                }
             }
             else
             {
                 _checkerColor = CheckerColor.White;
+                prefabName = whiteCheckerPrefab.name;
                 
                 // We know another player is here, so let's start allowing play. 
                 _gameState = GameState.PlayingGame;
             }
 
-            SetupCheckers();
+            SetupCheckers(player1, prefabName);
+
+            if (localPlay)
+            {
+                // Just always assume the 2nd player will use white in local play
+                SetupCheckers(!player1, whiteCheckerPrefab.name);
+            }
 
             SetupCamera(player1);
 
@@ -153,7 +177,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             _instantiated = true;
         }
         
-        if (PhotonNetwork.CurrentRoom.PlayerCount > 1)
+        if (!localPlay && PhotonNetwork.CurrentRoom.PlayerCount > 1)
         {
             interfaceManager.SetPlayGameText(MyTurn);
         }
@@ -167,7 +191,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             switch (_gameState)
             {
                 case GameState.PlayingGame:
-                    interfaceManager.SetPlayGameText(MyTurn);
+                    if (!localPlay)
+                    {
+                        interfaceManager.SetPlayGameText(MyTurn);   
+                    }
                     break;
                 case GameState.OpponentForfeit:
                     interfaceManager.SetOpponentForfeitPanel();
@@ -214,20 +241,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         }
     }
     
-    private void SetupCheckers()
+    private void SetupCheckers(bool player1, string prefabName)
     {
-        string prefabName;
-        Vector3 coords = new Vector3();
         GameObject checker = new GameObject();
-
-        if (_checkerColor == CheckerColor.Black)
-        {
-            prefabName = blackCheckerPrefab.name;
-        }
-        else
-        {
-            prefabName = whiteCheckerPrefab.name;
-        }
 
         // Create the whole set of checkers.
         foreach (KeyValuePair<string, CellState> state in BoardState)
@@ -259,6 +275,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             
             // TODO TIM: Is the tag needed for validation?
             checker.tag = state.Key;
+            
+            checker.GetComponent<MovePiece>().debugLocal = localPlay;
 
             //Make sure that we don't destroy already instantiated objects when another player enters the room and the 
             //scene reloads.
@@ -334,9 +352,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     
     }
 
-    public void OccupySpace(string cell)
+    public void OccupySpace(string cell, CellState player)
     {
-        if (player1)
+        if (player1 && player == CellState.Player1)
         {
             BoardState[cell] = CellState.Player1;
         }
@@ -351,7 +369,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         return BoardState[cell] == CellState.Player1 || BoardState[cell] == CellState.Player2;
     }
 
-    public bool IsOccupiedByOpponent(string cell)
+    public bool IsOccupiedByOpponent(string cell, bool player1)
     {
         if (player1)
         {
