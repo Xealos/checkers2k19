@@ -214,7 +214,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private void MoveChecker(GameObject go)
     {
-        this.gameObject.transform.position = new Vector3(go.transform.position.x, 0.25f, go.transform.position.z);
+        // Dynamically set the piece height based on whether we're a king (double stacked). If we don't, the king will spawn below the board.
+        float height = this.isKing ? 1.5f : 0.25f;
+        this.gameObject.transform.position = new Vector3(go.transform.position.x, height, go.transform.position.z);
     }
 
     private class JumpPositions {

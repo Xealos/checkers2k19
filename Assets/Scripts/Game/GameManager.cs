@@ -323,6 +323,9 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             return;
         }
 
+        // Save off the name
+        string name = checkerGo.name;
+
         PhotonNetwork.Destroy(checkerGo);
         Vector3 coords;
         string prefabName;
@@ -345,11 +348,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         
         // king.transform.parent = checkersConatiner.transform;
 
-        king.name = prefabName + " " + checkerTag; 
+        king.name = name;
         king.tag = checkerTag;
         
         DontDestroyOnLoad(king);
-    
     }
 
     public void OccupySpace(string cell, CellState player)
