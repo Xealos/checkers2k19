@@ -51,7 +51,7 @@ MonoBehaviour:
   playerPhotonView: {fileID: 8966604289600462447}
   selected: 0
   isKing: 1
-  debugLocal: 0
+  debugLocal: 1
   isBlackPiece: 1
 --- !u!114 &8966604289600462447
 MonoBehaviour:

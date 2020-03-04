@@ -31,8 +31,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4321346364199081751}
-  - {fileID: 4321346362396298442}
+  - {fileID: 7637947803408378318}
+  - {fileID: 7637947803031597587}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: -90}
@@ -51,7 +51,8 @@ MonoBehaviour:
   playerPhotonView: {fileID: 4321346364021684066}
   selected: 0
   isKing: 1
-  debugLocal: 0
+  debugLocal: 1
+  isBlackPiece: 0
 --- !u!114 &4321346364021684066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,7 +187,7 @@ PrefabInstance:
     - {fileID: -2720686709573781199, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
     - {fileID: 5968466132924758571, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
---- !u!4 &4321346362396298442 stripped
+--- !u!4 &7637947803031597587 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5910957537995439923, guid: 42f469271c7cd0746a5df66a0078e4dd,
     type: 3}
@@ -275,7 +276,7 @@ PrefabInstance:
     - {fileID: 8492123628440828609, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
     - {fileID: 5968466132924758571, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 42f469271c7cd0746a5df66a0078e4dd, type: 3}
---- !u!4 &4321346364199081751 stripped
+--- !u!4 &7637947803408378318 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5910957537995439923, guid: 42f469271c7cd0746a5df66a0078e4dd,
     type: 3}
