@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     public InterfaceManager interfaceManager;
     public Camera playerCamera;
     public static bool player1;
+    public AudioSource playerTurnDing;
 
     private CheckerColor _checkerColor;
     public static bool MyTurn;
@@ -472,7 +473,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         
         CheckForGameOver();
         
+        // Set the UI to the next player and if it's the local player's turn,
+        // play a sound to let them know.
         interfaceManager.SetPlayerTurnText(MyTurn);
+
+        if(MyTurn == true)
+        {
+            playerTurnDing.Play();
+        }
     }
     
     public void OnTurnCompleted(int turn)
