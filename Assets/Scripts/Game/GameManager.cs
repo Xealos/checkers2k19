@@ -439,9 +439,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     {
         // seen when other disconnects
         Debug.LogFormat("{0} has left the match!", other.NickName);
-
+        
+        // Don't erronousely inidicate the player has forfeit if the game is already over.
+        // They are just leaving at the concusion of a match.
+        if(_gameState != GameState.PlayerWin &&  _gameState != GameState.OpponentWin)
+        {
         // Opponent has left the game, we're no longer allowing play at this point.
         _gameState = GameState.OpponentForfeit;
+        }
     }
 
     #endregion
