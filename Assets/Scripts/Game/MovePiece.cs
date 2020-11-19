@@ -97,11 +97,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool hitSomething = Physics.Raycast(ray, out hit, 100.00f) && hit.transform != null;
-
             
-
-            // First movement logic
-            if ( hitSomething && initialJump) {
+            // First movement logic 
+            if (hitSomething && initialJump) {
                 SelectionLogic(hit.transform.gameObject);
             }
 
@@ -110,7 +108,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
             if (hitSomething && !initialJump && multiJumpsAvailable)
             {
                 // Multi jump doesn't care about selection logic so just check to see that the name is in the SPACE NAMES.
-                // SPACE_NAMES.Contains(gameObject.name)
+                if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name))
+                {
+                    PerformMovement(hit.transform.gameObject);
+                }
                 // Move Piece
             }
 
