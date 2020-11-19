@@ -17,6 +17,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private static bool _instantiated;
 
+    private static bool initialJump = true;
+
+    private static bool multiJumpsAvailable = false;
+
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
             "A1",
@@ -63,10 +67,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (debugLocal == false)
+            if (!debugLocal)
             {
                 // First, check with the Game Manager to see if we're allowed to continue
-                if (_gameManager.GamePlayAllowed() == false)
+                if (!_gameManager.GamePlayAllowed())
                 {
                     // Game Manager said no, so there's no sense in continuing. 
                     return;
@@ -78,50 +82,107 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     return;
                 }    
             }
+            
+            // Easter Egg: Rachel likes green.
+            // multiJumpsAvailable = CheckForMultiJumps();
 
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            if (Physics.Raycast(ray, out hit, 100.00f)) {
+            if (Physics.Raycast(ray, out hit, 100.00f) && hit.transform != null) {
+                SelectionLogic(hit.transform.gameObject);
+            }
 
-                if (hit.transform != null) {
+            // TODO: Multi jump logic here
 
-                    if (hit.transform.gameObject.name == this.gameObject.name)
-                    {
-                        selected = true;
-                    }
-                    else if (SPACE_NAMES.Contains(hit.transform.gameObject.name) && selected)
-                    {
-                        // If it's our turn, Validate movement here.
-                        if (IsMoveValid(hit.transform.gameObject.name))
-                        {
-                            // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
-                            // TODO          to make the data structure private and have an accessor function in 
-                            // TODO          the game manager. 
-                            _gameManager.OccupySpace(hit.transform.gameObject.name);
-                            GameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
-                            MoveChecker(hit.transform.gameObject);
-                            selected = false;
-                            this.gameObject.tag = hit.transform.gameObject.name;
-                            this.gameObject.name = _gameManager.GetCheckerStr() + hit.transform.gameObject.name;
+            // If the player already made the initialJump and there are no multi-jumps left,
+            // Then we can end the turn and update the game state.
+            // if (!initialJump && !multiJumpsAvailable) {
+                // initialJump = true;
+                // multiJumpsAvailable = false;
+                // Only update game manager if no double jump
 
-                            // If the checker is at the opposite end of the board, check to see if it can be made a king.
-                            if (checkForKingability(GameManager.player1,this.gameObject.tag))
-                            {
-                                _gameManager.KingMe(this.gameObject.tag);
-                            }
+                // Tell the game manager to update the game state
+                // _gameManager.UpdateGameState(/*true*/);
+            // }
+        }
+    }
 
-                            // Tell the game manager to update the game state
-                            _gameManager.UpdateGameState();
-                        }
-                    }
-                    else
-                    {
-                        selected = false;
+    // This method will need to check for the availability of multi-jumps on every Update loop.
+    private bool CheckForMultiJumps(){
+        // Have we performed our initial jump? If so, then we don't need to check just yet.
+        if (initialJump) {
+            return false;
+        }
+
+        List<JumpPositions> validJumps;
+
+        if (isKing) {
+            validJumps = validKingJumps;
+        }
+        else if (GameManager.player1) {
+            validJumps = validBlackJumps;
+        } else {
+            validJumps = validWhiteJumps;
+        }
+
+        // Call IsMoveValid for each of the spaces we can jump to from the current space.
+        // TODO TIM: How do I figure out what spaces I can jump to?
+
+        foreach(JumpPositions jumpPositions in validJumps) {
+            // If this current space matches the one in the dictionary
+            if (this.gameObject.tag.Equals(jumpPositions.getCurrentPosition())){
+                // Then loop through its JumpPosition keys and look for valid jumps
+                foreach (string jumpDestination in jumpPositions.getJumps().Keys) {
+                    // If a single jump is valid, then multiJumps are possible.
+                    if(IsMoveValid(jumpDestination)){
+                        return true;
                     }
                 }
             }
         }
+        return false;
+    }
+
+    private void SelectionLogic(GameObject gameObject) {
+        if (gameObject.name == this.gameObject.name)
+        {
+            selected = true;
+        }
+        else if (SPACE_NAMES.Contains(gameObject.name) && selected)
+        {
+            // If it's our turn, Validate movement here.
+            if (IsMoveValid(gameObject.name))
+            {
+                PerformMovement(gameObject);
+            }
+        }
+        else
+        {
+            selected = false;
+        }
+    }
+
+    private void PerformMovement(GameObject gameObject) {
+        // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
+        // TODO          to make the data structure private and have an accessor function in 
+        // TODO          the game manager. 
+        _gameManager.OccupySpace(gameObject.name);
+        GameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
+        MoveChecker(gameObject);
+        // TODO TIM: selected logic will need to be moved elsewhere due to multijumps.
+        selected = false;
+        this.gameObject.tag = gameObject.name;
+        this.gameObject.name = _gameManager.GetCheckerStr() + gameObject.name;
+
+        // If the checker is at the opposite end of the board, check to see if it can be made a king.
+        if (checkForKingability(GameManager.player1,this.gameObject.tag))
+        {
+            _gameManager.KingMe(this.gameObject.tag);
+        }
+
+        // TODO: Move when multijumps are implemented.
+        _gameManager.UpdateGameState();
     }
 
     private bool checkForKingability(bool isPlayer1, string space)
@@ -210,6 +271,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
         this.gameObject.transform.position = new Vector3(go.transform.position.x, height, go.transform.position.z);
     }
 
+    // TODO TIM: Move to it's own class.
     private class JumpPositions {
         private string currentPosition;
         // Key is jump destination, value is the position in between.
