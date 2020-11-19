@@ -70,9 +70,17 @@ public class MovePiece : MonoBehaviourPunCallbacks
             if (!debugLocal)
             {
                 // First, check with the Game Manager to see if we're allowed to continue
+                
                 if (!_gameManager.GamePlayAllowed())
                 {
                     // Game Manager said no, so there's no sense in continuing. 
+                    return;
+                }
+
+                // We're checking if Game Play is allowed AND the piece being passed in is the one that
+                // moved last this turn and a move has happened 
+                if (! _gameManager.DoubleJumpAllowed(this.gameObject.name))
+                {
                     return;
                 }
             
@@ -88,23 +96,34 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            bool hitSomething = Physics.Raycast(ray, out hit, 100.00f) && hit.transform != null;
 
-            if (Physics.Raycast(ray, out hit, 100.00f) && hit.transform != null) {
+            
+
+            // First movement logic
+            if ( hitSomething && initialJump) {
                 SelectionLogic(hit.transform.gameObject);
             }
 
             // TODO: Multi jump logic here
+            // TODO: I don't think we need initial Jump check. 
+            if (hitSomething && !initialJump && multiJumpsAvailable)
+            {
+                // Multi jump doesn't care about selection logic so just check to see that the name is in the SPACE NAMES.
+                // SPACE_NAMES.Contains(gameObject.name)
+                // Move Piece
+            }
 
             // If the player already made the initialJump and there are no multi-jumps left,
             // Then we can end the turn and update the game state.
-            // if (!initialJump && !multiJumpsAvailable) {
-                // initialJump = true;
-                // multiJumpsAvailable = false;
+            if (!initialJump && !multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name)) {
+                initialJump = true;
+                multiJumpsAvailable = false;
                 // Only update game manager if no double jump
 
                 // Tell the game manager to update the game state
-                // _gameManager.UpdateGameState(/*true*/);
-            // }
+                _gameManager.UpdateGameState(/*true*/);
+            }
         }
     }
 
@@ -144,6 +163,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
         return false;
     }
 
+    // TODO: Name of function implies that it's just selecting something when in fact
+    // TODO: it's also moving something. Maybe return a bool and then call PerformMovement
+    // TODO: outside this.
     private void SelectionLogic(GameObject gameObject) {
         if (gameObject.name == this.gameObject.name)
         {
@@ -164,12 +186,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
     }
 
     private void PerformMovement(GameObject gameObject) {
-        // TODO Brandon: I think instead of editing the board state directly, it'd be safer 
-        // TODO          to make the data structure private and have an accessor function in 
-        // TODO          the game manager. 
-        _gameManager.OccupySpace(gameObject.name);
-        GameManager.BoardState[this.gameObject.tag] = GameManager.CellState.Empty;
+        _gameManager.UpdateBoard(gameObject.name, this.gameobject.tag);
         MoveChecker(gameObject);
+
         // TODO TIM: selected logic will need to be moved elsewhere due to multijumps.
         selected = false;
         this.gameObject.tag = gameObject.name;

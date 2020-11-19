@@ -7,6 +7,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// 
+/// </summary>
 public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 {
     public GameObject blackCheckerPrefab;
@@ -25,6 +28,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
     private static bool _instantiated;
     private static GameState _gameState;
     private static GameState _gameStatePrev;
+    private static string _lastPieceMoved;
+    private static bool _moveHappened;
     private static Vector2 _cellSize = new Vector2(0.62f, 0.62f);
     private static Vector2 _checkerBoardOrigin = new Vector2(2.765f, 2.422f);
 
@@ -277,6 +282,16 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         return false;
     }
 
+    public bool DoubleJumpAllowed(string name)
+    {
+        return GamePlayAllowed() && _lastPieceMoved == name && _moveHappened;
+    }
+
+    public bool MoveHappened()
+    {
+        return _moveHappened;
+    }
+
     public void UpdateGameState()
     {
         if (MyTurn)
@@ -288,6 +303,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
             // TODO Brandon: This won't work for double jumps. 
             _turnManager.SendMove(BoardState, false);
             _turnManager.SendMove(BoardState, true);
+            _lastPieceMoved = null;
+            _moveHappened = false;
         }
     }
 
@@ -335,6 +352,14 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         king.tag = checkerTag;
         
         DontDestroyOnLoad(king);
+    }
+
+    public void UpdateBoard(string name, string space)
+    {
+        _lastPieceMoved = name;
+        _moveHappened = true;
+        OccupySpace(name);
+        GameManager.BoardState[space] = GameManager.CellState.Empty;
     }
 
     public void OccupySpace(string cell)
