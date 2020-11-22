@@ -82,7 +82,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                 // First we check if a move has not happened.
                 // We're checking if Game Play is allowed AND the piece being passed in is the one that
                 // moved last this turn and a move has happened 
-                if (_gameManager.MoveHappened() && !_gameManager.DoubleJumpAllowed(this.gameObject.name))
+                if (_gameManager.MoveHappened() && !_gameManager.DoubleJumpAllowed(this.gameObject.tag))
                 {
                     return;
                 }
@@ -103,7 +103,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
             // First movement logic 
             if (hitSomething && initialMove) {
                 SelectionLogic(hit.transform.gameObject);
-            } else if (hitSomething && !initialMove && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name)) {
+            } else if (hitSomething && !initialMove && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.tag)) {
                 // Multi jump doesn't care about selection logic so just check to see that the name is in SPACE_NAMES.
                 if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name, true))
                 {
