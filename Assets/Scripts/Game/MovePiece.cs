@@ -17,9 +17,11 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private static bool _instantiated;
 
-    private static bool initialJump = true;
+    private static bool initialMove = true;
 
     private static bool multiJumpsAvailable = false;
+
+    private static bool madeAJump = false;
 
     private readonly List<string> SPACE_NAMES = new List<string>()
         {
@@ -65,8 +67,6 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        multiJumpsAvailable = CheckForMultiJumps();
-
         if (Input.GetMouseButtonDown(0))
         {
             if (!debugLocal)
@@ -101,11 +101,11 @@ public class MovePiece : MonoBehaviourPunCallbacks
             bool hitSomething = Physics.Raycast(ray, out hit, 100.00f) && hit.transform != null;
             
             // First movement logic 
-            if (hitSomething && initialJump) {
+            if (hitSomething && initialMove) {
                 SelectionLogic(hit.transform.gameObject);
             }
             
-            if (hitSomething && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name))
+            if (hitSomething && !initialMove && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name))
             {
                 // Multi jump doesn't care about selection logic so just check to see that the name is in SPACE_NAMES.
                 if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name))
@@ -117,8 +117,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
             // If the player already made the initialJump and there are no multi-jumps left,
             // Then we can end the turn and update the game state.
-            if (!initialJump && !multiJumpsAvailable) {
-                initialJump = true;
+            if (!initialMove && !multiJumpsAvailable) {
+                initialMove = true;
+                madeAJump = false;
                 // Only update game manager if no double jump
 
                 // Tell the game manager to update the game state
@@ -130,7 +131,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
     // This method will need to check for the availability of multi-jumps on every Update loop.
     private bool CheckForMultiJumps(){
         // Have we performed our initial jump? If so, then we don't need to check just yet.
-        if (initialJump) {
+        // Also, if you made a move that was NOT a jump, there will be no multi-jumps this turn.
+        if (initialMove || !madeAJump) {
             return false;
         }
 
@@ -185,7 +187,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
     private void PerformMovement(GameObject gameObject) {
         _gameManager.UpdateBoard(gameObject.name, this.gameObject.tag);
         MoveChecker(gameObject);
-        initialJump = false;
+        initialMove = false;
 
         // TODO TIM: selected logic will need to be moved elsewhere due to multijumps.
         selected = false;
@@ -197,6 +199,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
         {
             _gameManager.KingMe(this.gameObject.tag);
         }
+
+        multiJumpsAvailable = CheckForMultiJumps();
 
         // Always update the gamestate since movement occurred.
         _gameManager.UpdateGameState(false);
@@ -272,6 +276,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     if (_gameManager.IsOccupiedByOpponent(jumpOverSpace))
                     {
                         GameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
+                        madeAJump = true;
                         return true;
                     }
                 }
