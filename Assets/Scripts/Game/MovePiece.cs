@@ -103,12 +103,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
             // First movement logic 
             if (hitSomething && initialMove) {
                 SelectionLogic(hit.transform.gameObject);
-            }
-            
-            if (hitSomething && !initialMove && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name))
-            {
+            } else if (hitSomething && !initialMove && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name)) {
                 // Multi jump doesn't care about selection logic so just check to see that the name is in SPACE_NAMES.
-                if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name))
+                if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name, true))
                 {
                     // Move Piece
                     PerformMovement(hit.transform.gameObject);
@@ -153,7 +150,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                 // Then loop through its JumpPosition keys and look for valid jumps
                 foreach (string jumpDestination in jumpPositions.getJumps().Keys) {
                     // If a single jump is valid, then multiJumps are possible.
-                    if(IsMoveValid(jumpDestination)){
+                    if(IsMoveValid(jumpDestination, false)){
                         return true;
                     }
                 }
@@ -173,7 +170,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
         else if (SPACE_NAMES.Contains(gameObject.name) && selected)
         {
             // If it's our turn, Validate movement here.
-            if (IsMoveValid(gameObject.name))
+            if (IsMoveValid(gameObject.name, true))
             {
                 PerformMovement(gameObject);
             }
@@ -222,7 +219,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
     }
 
     // Pass in the name of the space.
-    private bool IsMoveValid(string name)
+    private bool IsMoveValid(string name, bool makeAMove)
     {
         Dictionary<string, List<string>> validMovements;
         List<JumpPositions> validJumps;
@@ -275,8 +272,12 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     
                     if (_gameManager.IsOccupiedByOpponent(jumpOverSpace))
                     {
-                        GameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
-                        madeAJump = true;
+                        // TODO: This logic should not exist here. 
+                        // TODO: This method should only check if a move can be made.
+                        if (makeAMove) {
+                            GameManager.BoardState[jumpOverSpace] = GameManager.CellState.Empty;
+                            madeAJump = true;
+                        }
                         return true;
                     }
                 }
