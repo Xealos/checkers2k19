@@ -292,7 +292,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
         return _moveHappened;
     }
 
-    public void UpdateGameState()
+    public void UpdateGameState(bool turnOver)
     {
         if (MyTurn)
         {
@@ -301,10 +301,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunTurnManagerCallbacks
 
             // If the move is valid, send the updated board state and indicate the player has finished their turn.
             // TODO Brandon: This won't work for double jumps. 
-            _turnManager.SendMove(BoardState, false);
-            _turnManager.SendMove(BoardState, true);
-            _lastPieceMoved = null;
-            _moveHappened = false;
+            if (turnOver) {
+                _turnManager.SendMove(BoardState, false);
+                _turnManager.SendMove(BoardState, true);
+                _lastPieceMoved = null;
+                _moveHappened = false;
+            } else {
+                // The turn is not over, we only want the board state updated
+                _turnManager.SendMove(BoardState, false);
+            }
         }
     }
 

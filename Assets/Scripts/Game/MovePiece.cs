@@ -65,6 +65,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
 
     private void Update()
     {
+        multiJumpsAvailable = CheckForMultiJumps();
+
         if (Input.GetMouseButtonDown(0))
         {
             if (!debugLocal)
@@ -77,9 +79,10 @@ public class MovePiece : MonoBehaviourPunCallbacks
                     return;
                 }
 
+                // First we check if a move has not happened.
                 // We're checking if Game Play is allowed AND the piece being passed in is the one that
                 // moved last this turn and a move has happened 
-                if (! _gameManager.DoubleJumpAllowed(this.gameObject.name))
+                if (_gameManager.MoveHappened() && !_gameManager.DoubleJumpAllowed(this.gameObject.name))
                 {
                     return;
                 }
@@ -91,8 +94,7 @@ public class MovePiece : MonoBehaviourPunCallbacks
                 }    
             }
             
-            // Easter Egg: Rachel likes green.
-            // multiJumpsAvailable = CheckForMultiJumps();
+            // Easter Egg: Rachel likes green comments.
 
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -102,28 +104,25 @@ public class MovePiece : MonoBehaviourPunCallbacks
             if (hitSomething && initialJump) {
                 SelectionLogic(hit.transform.gameObject);
             }
-
-            // TODO: Multi jump logic here
-            // TODO: I don't think we need initial Jump check. 
-            if (hitSomething && !initialJump && multiJumpsAvailable)
+            
+            if (hitSomething && multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name))
             {
-                // Multi jump doesn't care about selection logic so just check to see that the name is in the SPACE NAMES.
+                // Multi jump doesn't care about selection logic so just check to see that the name is in SPACE_NAMES.
                 if(SPACE_NAMES.Contains(hit.transform.gameObject.name) && IsMoveValid(hit.transform.gameObject.name))
                 {
+                    // Move Piece
                     PerformMovement(hit.transform.gameObject);
                 }
-                // Move Piece
             }
 
             // If the player already made the initialJump and there are no multi-jumps left,
             // Then we can end the turn and update the game state.
-            if (!initialJump && !multiJumpsAvailable && _gameManager.DoubleJumpAllowed(this.gameObject.name)) {
+            if (!initialJump && !multiJumpsAvailable) {
                 initialJump = true;
-                multiJumpsAvailable = false;
                 // Only update game manager if no double jump
 
                 // Tell the game manager to update the game state
-                _gameManager.UpdateGameState(/*true*/);
+                _gameManager.UpdateGameState(true);
             }
         }
     }
@@ -145,9 +144,6 @@ public class MovePiece : MonoBehaviourPunCallbacks
         } else {
             validJumps = validWhiteJumps;
         }
-
-        // Call IsMoveValid for each of the spaces we can jump to from the current space.
-        // TODO TIM: How do I figure out what spaces I can jump to?
 
         foreach(JumpPositions jumpPositions in validJumps) {
             // If this current space matches the one in the dictionary
@@ -187,8 +183,9 @@ public class MovePiece : MonoBehaviourPunCallbacks
     }
 
     private void PerformMovement(GameObject gameObject) {
-        _gameManager.UpdateBoard(gameObject.name, this.gameobject.tag);
+        _gameManager.UpdateBoard(gameObject.name, this.gameObject.tag);
         MoveChecker(gameObject);
+        initialJump = false;
 
         // TODO TIM: selected logic will need to be moved elsewhere due to multijumps.
         selected = false;
@@ -201,8 +198,8 @@ public class MovePiece : MonoBehaviourPunCallbacks
             _gameManager.KingMe(this.gameObject.tag);
         }
 
-        // TODO: Move when multijumps are implemented.
-        _gameManager.UpdateGameState();
+        // Always update the gamestate since movement occurred.
+        _gameManager.UpdateGameState(false);
     }
 
     private bool checkForKingability(bool isPlayer1, string space)
